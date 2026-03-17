@@ -250,11 +250,8 @@ export default function Home() {
               )}
 
               <div style={{padding:"10px"}}>
-                <Editable 
-                  text={item.prompt.length > 120 
-                    ? item.prompt.slice(0,120) + "..." 
-                    : item.prompt
-                  } 
+               <Editable 
+                text={item.prompt} 
                   onSave={(t)=>editPrompt(item.id, t)} 
                 />
 
