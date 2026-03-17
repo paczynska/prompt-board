@@ -156,16 +156,27 @@ export default function Home() {
                 }}
               >
                 
-              <img 
-  src={item.image} 
-  alt="img"
-  style={{
-    width: "100%",
-    height: "auto",
-    borderRadius: "12px",
-    display: "block"
-  }}
-/>
+              {item.fileType === "video" ? (
+  <video 
+    src={item.image}
+    controls
+    style={{
+      width: "100%",
+      borderRadius: "12px"
+    }}
+  />
+) : (
+  <img 
+    src={item.image} 
+    alt="img"
+    style={{
+      width: "100%",
+      height: "auto",
+      borderRadius: "12px",
+      display: "block"
+    }}
+  />
+)}
 
                 <div style={{
   padding:"10px",
