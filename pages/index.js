@@ -106,15 +106,14 @@ export default function Home() {
             }}
           />
 
-          <select 
-            value={type} 
-            onChange={e=>setType(e.target.value)}
-            style={{marginBottom:"10px", padding:"8px"}}
-          >
-            <option value="chatgpt">🤖 ChatGPT</option>
-            <option value="nanobanana">🍌 NanoBanana</option>
-          </select>
-
+         <select 
+  value={mediaType} 
+  onChange={(e)=>setMediaType(e.target.value)}
+  style={{marginBottom:"10px", padding:"8px"}}
+>
+  <option value="image">📸 Obraz</option>
+  <option value="video">🎬 Video (Veo3)</option>
+</select>
           <br/>
 
           <button 
