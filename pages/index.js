@@ -69,15 +69,17 @@ const savePrompt = async () => {
       <br/><br/>
       <button onClick={savePrompt}>Zapisz</button>
 
-      <div>
-        {prompts.map(item => (
-          <div key={item.id} style={{marginTop:20}}>
-            <img src={item.image} width="200" />
-            <Editable text={item.prompt} onSave={(t)=>editPrompt(item.id, t)} />
-            <p>{item.type}</p>
-          </div>
-        ))}
+     <div>
+  {prompts.map((item) => {
+    return (
+      <div key={item.id} style={{ marginTop: 20 }}>
+        <img src={item.image} width="200" alt="img" />
+        <Editable text={item.prompt} onSave={(t) => editPrompt(item.id, t)} />
+        <p>{item.type}</p>
       </div>
+    );
+  })}
+</div>
     </div>
   );
 }
