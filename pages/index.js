@@ -7,6 +7,7 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState("chatgpt");
   const [file, setFile] = useState(null);
+  const [columns, setColumns] = useState(4);
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
