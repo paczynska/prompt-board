@@ -21,7 +21,10 @@ export default function Home() {
   }, []);
 
   const savePrompt = async () => {
-    if (!file) return alert("Dodaj plik!");
+    if (!file) {
+      alert("Dodaj plik!");
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -52,6 +55,7 @@ export default function Home() {
       setFile(null);
       setPreview(null);
       setPrompt("");
+
       loadPrompts();
 
     } catch (err) {
@@ -106,23 +110,23 @@ export default function Home() {
               : "📸 Dodaj obraz"}
           </p>
 
-          {/* INPUT */}
+          {/* INPUT (NAPRAWIONY) */}
           <input 
+            key={mediaType}
             type="file" 
-            accept={mediaType === "video" ? "video/mp4" : "image/*"}
+            accept={mediaType === "video" ? "video/*" : "image/*"}
             onChange={(e) => {
-              const selected = e.target.files[0];
+              const selected = e.target.files?.[0];
+              if (!selected) return;
+
               setFile(selected);
+              setPreview(URL.createObjectURL(selected));
 
-              if (selected) {
-                setPreview(URL.createObjectURL(selected));
-
-                if (selected.type.startsWith("video")) {
-                  setMediaType("video");
-                  setType("veo3");
-                } else {
-                  setMediaType("image");
-                }
+              if (selected.type.startsWith("video")) {
+                setMediaType("video");
+                setType("veo3");
+              } else {
+                setMediaType("image");
               }
             }}
             style={{marginBottom:"10px"}}
@@ -178,12 +182,6 @@ export default function Home() {
             <option value="nanobanana">🍌 NanoBanana</option>
             <option value="veo3">🎬 Veo3</option>
           </select>
-
-          <p style={{fontSize:"12px", opacity:0.6}}>
-            {mediaType === "video"
-              ? "🎬 Video zawsze zapisuje się jako Veo3"
-              : "📸 Wybierz generator obrazu"}
-          </p>
 
           <button 
             onClick={savePrompt}
@@ -250,10 +248,7 @@ export default function Home() {
                 />
               )}
 
-              <div style={{
-                padding:"10px",
-                background:"#1a1a1a"
-              }}>
+              <div style={{padding:"10px"}}>
                 <Editable 
                   text={item.prompt.length > 120 
                     ? item.prompt.slice(0,120) + "..." 
