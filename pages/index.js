@@ -152,7 +152,7 @@ export default function Home() {
   src={item.image} 
   alt="img"
   style={{
-    width: "100%",
+    width: "80%",
     height: "auto",
     borderRadius: "12px",
     display: "block"
