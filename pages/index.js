@@ -96,8 +96,9 @@ export default function Home() {
             onChange={(e)=>setMediaType(e.target.value)}
             style={{marginBottom:"10px", padding:"8px"}}
           >
-            <option value="image">📸 Obraz</option>
-            <option value="video">🎬 Video (Veo3)</option>
+          <option value="chatgpt">🤖 ChatGPT</option>
+          <option value="nanobanana">🍌 NanoBanana</option>
+          <option value="veo3">🎬 Veo3</option>
           </select>
 
           {/* OPIS */}
@@ -110,13 +111,20 @@ export default function Home() {
             type="file" 
             accept={mediaType === "video" ? "video/mp4" : "image/*"}
             onChange={(e) => {
-              const selected = e.target.files[0];
-              setFile(selected);
+  const selected = e.target.files[0];
+  setFile(selected);
 
-              if (selected) {
-                setPreview(URL.createObjectURL(selected));
-              }
-            }}
+  if (selected) {
+    setPreview(URL.createObjectURL(selected));
+
+    if (selected.type.startsWith("video")) {
+      setMediaType("video");
+      setType("veo3"); // 🔥 AUTO VEO3
+    } else {
+      setMediaType("image");
+    }
+  }
+}}
             style={{marginBottom:"10px"}}
           />
 
