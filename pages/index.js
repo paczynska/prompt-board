@@ -87,6 +87,33 @@ const [mediaType, setMediaType] = useState("image");
           marginBottom: "30px",
           boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
         }}>
+
+ <select 
+  value={mediaType} 
+  onChange={(e)=>setMediaType(e.target.value)}
+  style={{marginBottom:"10px", padding:"8px"}}
+>
+  <option value="image">📸 Obraz</option>
+  <option value="video">🎬 Video (Veo3)</option>
+</select>
+          <br/>
+
+          <button 
+            onClick={savePrompt}
+            style={{
+              background:"linear-gradient(135deg,#ff4d4d,#ff0080)",
+              border:"none",
+              padding:"10px 20px",
+              borderRadius:"12px",
+              color:"white",
+              cursor:"pointer"
+            }}
+          >
+            💾 Zapisz
+          </button>
+        </div>
+
+          
          <input 
   type="file" 
   accept={mediaType === "video" ? "video/mp4" : "image/*"}
