@@ -171,7 +171,8 @@ export default function Home() {
               marginBottom:"20px",
               background:"#1a1a1a",
               borderRadius:"12px",
-              padding:"10px"
+              padding:"10px",
+              overflow:"visible"
             }}>
               
               {item.fileType === "video" ? (
@@ -182,7 +183,6 @@ export default function Home() {
 
               <Editable text={item.prompt} onSave={(t)=>editPrompt(item.id, t)} />
 
-              {/* PRZYCISK KOPIUJ */}
               <button 
                 onClick={()=>copyPrompt(item.prompt)}
                 style={{
@@ -228,7 +228,12 @@ function Editable({text, onSave}) {
 
   return (
     <div>
-      <p>
+      <p style={{
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+        overflowWrap: "break-word",
+        lineHeight: "1.5"
+      }}>
         {expanded ? text : text.slice(0,120)}
         {!expanded && text.length > 120 && "..."}
       </p>
