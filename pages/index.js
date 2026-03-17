@@ -6,7 +6,8 @@ export default function Home() {
   const [prompts, setPrompts] = useState([]);
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState("chatgpt");
-  const [file, setFile] = useState(null);
+ const [file, setFile] = useState(null);
+const [mediaType, setMediaType] = useState("image");
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
