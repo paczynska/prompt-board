@@ -4,7 +4,6 @@ import { collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore"
 
 export default function Home() {
   const [prompts, setPrompts] = useState([]);
-  const [image, setImage] = useState("");
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState("chatgpt");
   const [file, setFile] = useState(null);
