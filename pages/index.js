@@ -146,11 +146,14 @@ export default function Home() {
   src={item.image} 
   alt="img"
   style={{
-    width: "100%",
-    height: "220px",
-    objectFit: "cover",
-    transition: "0.4s"
-  }}
+  breakInside: "avoid",
+  marginBottom: "25px",
+  background: "#1a1a1a",
+  borderRadius: "16px",
+  overflow: "hidden",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+  transition: "0.3s"
+}}
 />
               <div style={{padding:"10px"}}>
                <Editable 
