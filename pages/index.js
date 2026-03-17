@@ -153,8 +153,8 @@ export default function Home() {
                   alt="img"
                   style={{
                     width: "100%",
-                    height: "220px",
-                    objectFit: "cover",
+                    height: "220px"
+                    objectFit: "cover"
                     display: "block"
                   }}
                 />
