@@ -159,7 +159,10 @@ export default function Home() {
   }}
 />
 
-                <div style={{padding:"10px"}}>
+                <div style={{
+  padding:"10px",
+  background:"#1a1a1a"
+}}>
                   <Editable 
                     text={item.prompt.length > 120 
                       ? item.prompt.slice(0,120) + "..." 
