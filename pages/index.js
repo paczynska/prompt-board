@@ -164,9 +164,13 @@ export default function Home() {
   } 
   onSave={(t)=>editPrompt(item.id, t)} 
 />
-                <p style={{opacity:0.6, fontSize:"12px"}}>
-                  {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
-                </p>
+               <p style={{
+  opacity: 0.6,
+  fontSize: "12px",
+  marginTop: "5px"
+}}>
+  {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
+</p>
               </div>
 
             </div>
