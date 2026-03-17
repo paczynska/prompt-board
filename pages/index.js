@@ -142,17 +142,16 @@ export default function Home() {
               }}
             >
 
-              <img 
-                src={item.image} 
-                alt="img"
-                style={{
-                  width: "100%",
-                  maxHeight: "250px",
-                  objectFit: "cover",
-                  transition: "0.4s"
-                }}
-              />
-
+             <img 
+  src={item.image} 
+  alt="img"
+  style={{
+    width: "100%",
+    height: "220px",
+    objectFit: "cover",
+    transition: "0.4s"
+  }}
+/>
               <div style={{padding:"10px"}}>
                <Editable 
   text={item.prompt.length > 120 
