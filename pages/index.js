@@ -102,11 +102,13 @@ const savePrompt = async () => {
        <img 
   src={item.image} 
   alt="img"
-style={{
-  width: "100%",
-  height: "200px",
-  objectFit: "cover"
-}}
+  style={{
+    width: "100%",
+    maxHeight: "250px",
+    objectFit: "cover",
+    borderRadius: "12px"
+  }}
+/>
   onMouseEnter={(e) => {
     e.currentTarget.style.transform = "scale(1.1)";
   }}
