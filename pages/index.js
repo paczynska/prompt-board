@@ -124,24 +124,25 @@ export default function Home() {
         {prompts.map((item) => {
           return (
             <div 
-              key={item.id} 
-              style={{
-                breakInside: "avoid",
-                marginBottom: "20px",
-                background: "#1a1a1a",
-                borderRadius: "16px",
-                overflow: "hidden",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.6)",
-                transition: "0.3s"
-              }}
-              onMouseEnter={(e)=>{
-                e.currentTarget.style.transform="scale(1.03)";
-              }}
-              onMouseLeave={(e)=>{
-                e.currentTarget.style.transform="scale(1)";
-              }}
-            >
-
+  key={item.id} 
+  style={{
+    breakInside: "avoid",
+    marginBottom: "25px",
+    background: "#1a1a1a",
+    borderRadius: "16px",
+    overflow: "hidden",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+    transition: "0.3s"
+  }}
+  onMouseEnter={(e)=>{
+    e.currentTarget.style.transform="translateY(-8px)";
+    e.currentTarget.style.boxShadow="0 20px 40px rgba(0,0,0,0.8)";
+  }}
+  onMouseLeave={(e)=>{
+    e.currentTarget.style.transform="translateY(0)";
+    e.currentTarget.style.boxShadow="0 10px 25px rgba(0,0,0,0.5)";
+  }}
+>
              <img 
   src={item.image} 
   alt="img"
