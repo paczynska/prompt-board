@@ -78,10 +78,11 @@ export default function Home() {
     }}>
       
       <div style={{
-        padding: "20px 40px",
-        width: "100%",
-        color: "white"
-      }}>
+  padding: "20px",
+  maxWidth: "1200px",
+  margin: "0 auto",
+  color: "white"
+}}>
 
         <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
