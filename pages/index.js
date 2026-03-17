@@ -43,7 +43,7 @@ export default function Home() {
         image: data.secure_url,
         prompt,
         type,
-        fileType: file.type.startsWith("video") ? "video" : "image",
+       fileType: mediaType,
         createdAt: new Date()
       });
 
