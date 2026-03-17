@@ -52,14 +52,18 @@ export default function Home() {
   };
 
   return (
-    <div style={{
-      padding: "20px",
-      background: "linear-gradient(135deg,#0f0f0f,#1a1a1a)",
-      minHeight: "100vh",
-      color: "white",
-      maxWidth: "1200px",
-      margin: "0 auto"
-    }}>
+   <div style={{
+  background: "#000",
+  minHeight: "100vh",
+  width: "100%"
+}}>
+  
+  <div style={{
+    padding: "20px",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    color: "white"
+  }}>
 
       <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
