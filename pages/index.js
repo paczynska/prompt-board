@@ -43,9 +43,9 @@ export default function Home() {
 
       await addDoc(collection(db, "prompts"), {
         image: data.secure_url,
-        prompt,
+        prompt: prompt || "",
         type,
-        fileType: mediaType,
+        fileType: file.type.startsWith("video") ? "video" : "image",
         createdAt: new Date()
       });
 
@@ -67,15 +67,13 @@ export default function Home() {
   };
 
   const copyPrompt = (text) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     alert("Skopiowano prompt 🔥");
   };
 
   return (
-    <div style={{
-      background: "#000",
-      minHeight: "100vh"
-    }}>
+    <div style={{ background: "#000", minHeight: "100vh" }}>
       
       <div style={{
         padding: "20px",
@@ -104,8 +102,8 @@ export default function Home() {
 
           <p style={{fontSize:"12px", opacity:0.6}}>
             {mediaType === "video"
-              ? "🎬 Video = automatycznie Veo3"
-              : "📸 Dodaj obraz"}
+              ? "🎬 Dodajesz video (Veo3)"
+              : "📸 Dodajesz obraz"}
           </p>
 
           <input 
@@ -131,9 +129,9 @@ export default function Home() {
           {preview && (
             <div style={{marginTop:"10px"}}>
               {mediaType === "video" ? (
-                <video src={preview} controls style={{width:"100%"}} />
+                <video src={preview} controls style={{width:"100%", maxHeight:"300px"}} />
               ) : (
-                <img src={preview} style={{width:"100%"}} />
+                <img src={preview} style={{width:"100%", maxHeight:"300px", objectFit:"cover"}} />
               )}
             </div>
           )}
@@ -142,7 +140,11 @@ export default function Home() {
             placeholder="Wpisz prompt..." 
             value={prompt} 
             onChange={e=>setPrompt(e.target.value)}
-            style={{width:"100%", marginTop:"10px"}}
+            style={{
+              width:"100%",
+              marginTop:"10px",
+              minHeight:"80px"
+            }}
           />
 
           <select 
@@ -171,17 +173,31 @@ export default function Home() {
               marginBottom:"20px",
               background:"#1a1a1a",
               borderRadius:"12px",
-              padding:"10px",
-              overflow:"visible"
+              padding:"10px"
             }}>
               
               {item.fileType === "video" ? (
-                <video src={item.image} controls style={{width:"100%"}} />
+                <video 
+                  src={item.image} 
+                  controls 
+                  style={{width:"100%", maxHeight:"300px"}}
+                />
               ) : (
-                <img src={item.image} style={{width:"100%"}} />
+                <img 
+                  src={item.image} 
+                  style={{
+                    width:"100%",
+                    height:"auto",
+                    maxHeight:"300px",
+                    objectFit:"cover"
+                  }} 
+                />
               )}
 
-              <Editable text={item.prompt} onSave={(t)=>editPrompt(item.id, t)} />
+              <Editable 
+                text={item.prompt || ""} 
+                onSave={(t)=>editPrompt(item.id, t)} 
+              />
 
               <button 
                 onClick={()=>copyPrompt(item.prompt)}
@@ -212,15 +228,21 @@ export default function Home() {
   );
 }
 
-function Editable({text, onSave}) {
+function Editable({text = "", onSave}) {
   const [edit, setEdit] = useState(false);
   const [val, setVal] = useState(text);
   const [expanded, setExpanded] = useState(false);
 
+  const isLong = text.length > 120;
+
   if (edit) {
     return (
       <div>
-        <textarea value={val} onChange={e=>setVal(e.target.value)} />
+        <textarea 
+          value={val} 
+          onChange={e=>setVal(e.target.value)}
+          style={{width:"100%", minHeight:"80px"}}
+        />
         <button onClick={()=>{onSave(val); setEdit(false)}}>💾</button>
       </div>
     );
@@ -231,15 +253,14 @@ function Editable({text, onSave}) {
       <p style={{
         whiteSpace: "pre-wrap",
         wordBreak: "break-word",
-        overflowWrap: "break-word",
-        lineHeight: "1.5"
+        lineHeight: "1.6",
+        fontSize: "14px"
       }}>
-        {expanded ? text : text.slice(0,120)}
-        {!expanded && text.length > 120 && "..."}
+        {expanded || !isLong ? text : text.substring(0,120) + "..."}
       </p>
 
       <div style={{display:"flex", gap:"10px"}}>
-        {text.length > 120 && (
+        {isLong && (
           <button onClick={()=>setExpanded(!expanded)}>
             {expanded ? "▲ zwiń" : "▼ czytaj więcej"}
           </button>
