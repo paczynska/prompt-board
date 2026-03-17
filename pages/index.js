@@ -7,6 +7,7 @@ export default function Home() {
   const [image, setImage] = useState("");
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState("chatgpt");
+  const [file, setFile] = useState(null);
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
@@ -18,7 +19,33 @@ export default function Home() {
     loadPrompts();
   }, []);
 
-  const savePrompt = async () => {
+const savePrompt = async () => {
+  if (!file) return alert("Dodaj zdjęcie!");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "ml_default");
+
+  const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/image/upload", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  const imageUrl = data.secure_url;
+
+  await addDoc(collection(db, "prompts"), {
+    image: imageUrl,
+    prompt,
+    type,
+    createdAt: new Date()
+  });
+
+  setFile(null);
+  setPrompt("");
+  loadPrompts();
+};
+  
     await addDoc(collection(db, "prompts"), {
       image,
       prompt,
@@ -40,7 +67,7 @@ export default function Home() {
     <div style={{padding:20, background:"black", minHeight:"100vh", color:"white"}}>
       <h1>🔥 Prompt Board</h1>
 
-      <input placeholder="Image URL" value={image} onChange={e=>setImage(e.target.value)} />
+      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
       <br/><br/>
 
       <textarea placeholder="Prompt" value={prompt} onChange={e=>setPrompt(e.target.value)} />
