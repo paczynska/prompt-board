@@ -18,32 +18,32 @@ export default function Home() {
     loadPrompts();
   }, []);
 
-const savePrompt = async () => {
-  if (!file) return alert("Dodaj zdjęcie!");
+  const savePrompt = async () => {
+    if (!file) return alert("Dodaj zdjęcie!");
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", "ml_default");
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default");
 
-  const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/image/upload", {
-    method: "POST",
-    body: formData
-  });
+    const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/image/upload", {
+      method: "POST",
+      body: formData
+    });
 
-  const data = await res.json();
-  const imageUrl = data.secure_url;
+    const data = await res.json();
+    const imageUrl = data.secure_url;
 
-  await addDoc(collection(db, "prompts"), {
-    image: imageUrl,
-    prompt,
-    type,
-    createdAt: new Date()
-  });
+    await addDoc(collection(db, "prompts"), {
+      image: imageUrl,
+      prompt,
+      type,
+      createdAt: new Date()
+    });
 
-  setFile(null);
-  setPrompt("");
-  loadPrompts();
-};
+    setFile(null);
+    setPrompt("");
+    loadPrompts();
+  };
 
   const editPrompt = async (id, newPrompt) => {
     const ref = doc(db, "prompts", id);
@@ -53,75 +53,118 @@ const savePrompt = async () => {
 
   return (
     <div style={{
-  padding: "20px",
-  background: "black",
-  minHeight: "100vh",
-  color: "white",
-  maxWidth: "1200px",
-  margin: "0 auto"
-}}>
-      <h1>🔥 Prompt Board</h1>
+      padding: "20px",
+      background: "linear-gradient(135deg,#0f0f0f,#1a1a1a)",
+      minHeight: "100vh",
+      color: "white",
+      maxWidth: "1200px",
+      margin: "0 auto"
+    }}>
 
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <br/><br/>
+      <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
-      <textarea placeholder="Prompt" value={prompt} onChange={e=>setPrompt(e.target.value)} />
-      <br/><br/>
+      {/* FORM */}
+      <div style={{
+        background: "#1f1f1f",
+        padding: "20px",
+        borderRadius: "16px",
+        marginBottom: "30px",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+      }}>
+        <input 
+          type="file" 
+          onChange={(e) => setFile(e.target.files[0])}
+          style={{marginBottom:"10px"}}
+        />
 
-      <select value={type} onChange={e=>setType(e.target.value)}>
-        <option value="chatgpt">ChatGPT Image</option>
-        <option value="nanobanana">NanoBanana</option>
-      </select>
+        <textarea 
+          placeholder="Wpisz prompt..." 
+          value={prompt} 
+          onChange={e=>setPrompt(e.target.value)}
+          style={{
+            width:"100%",
+            padding:"10px",
+            borderRadius:"10px",
+            marginBottom:"10px",
+            border:"none"
+          }}
+        />
 
-      <br/><br/>
-      <button onClick={savePrompt}>Zapisz</button>
+        <select 
+          value={type} 
+          onChange={e=>setType(e.target.value)}
+          style={{marginBottom:"10px", padding:"8px"}}
+        >
+          <option value="chatgpt">🤖 ChatGPT</option>
+          <option value="nanobanana">🍌 NanoBanana</option>
+        </select>
 
-     <div>
-  {prompts.map((item) => {
-    return (
-      <div 
-  key={item.id} 
-  style={{
-    marginTop: 20,
-    borderRadius: "16px",
-    overflow: "hidden",
-    background: "#1a1a1a",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.6)",
-    transition: "all 0.3s ease",
-    cursor: "pointer"
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "scale(1.03)";
-    e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.8)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "scale(1)";
-    e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.6)";
-  }}
->
-       <img 
-  src={item.image} 
-  alt="img"
-  style={{
-    width: "100%",
-    maxHeight: "250px",
-    objectFit: "cover",
-    borderRadius: "12px"
-  }}
-/>
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "scale(1.1)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "scale(1)";
-  }}
-/>
-        <Editable text={item.prompt} onSave={(t) => editPrompt(item.id, t)} />
-        <p>{item.type}</p>
+        <br/>
+
+        <button 
+          onClick={savePrompt}
+          style={{
+            background:"linear-gradient(135deg,#ff4d4d,#ff0080)",
+            border:"none",
+            padding:"10px 20px",
+            borderRadius:"12px",
+            color:"white",
+            cursor:"pointer"
+          }}
+        >
+          💾 Zapisz
+        </button>
       </div>
-    );
-  })}
-</div>
+
+      {/* GRID */}
+      <div style={{
+        columnCount: 3,
+        columnGap: "20px"
+      }}>
+        {prompts.map((item) => {
+          return (
+            <div 
+              key={item.id} 
+              style={{
+                breakInside: "avoid",
+                marginBottom: "20px",
+                background: "#1a1a1a",
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.6)",
+                transition: "0.3s"
+              }}
+              onMouseEnter={(e)=>{
+                e.currentTarget.style.transform="scale(1.03)";
+              }}
+              onMouseLeave={(e)=>{
+                e.currentTarget.style.transform="scale(1)";
+              }}
+            >
+
+              <img 
+                src={item.image} 
+                alt="img"
+                style={{
+                  width: "100%",
+                  maxHeight: "250px",
+                  objectFit: "cover",
+                  transition: "0.4s"
+                }}
+              />
+
+              <div style={{padding:"10px"}}>
+                <Editable text={item.prompt} onSave={(t)=>editPrompt(item.id, t)} />
+                <p style={{opacity:0.6, fontSize:"12px"}}>
+                  {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
+                </p>
+              </div>
+
+            </div>
+          );
+        })}
+      </div>
+
     </div>
   );
 }
@@ -136,6 +179,8 @@ function Editable({text, onSave}) {
       <button onClick={()=>{onSave(val); setEdit(false)}}>💾</button>
     </div>
   ) : (
-    <p onClick={()=>setEdit(true)}>{text}</p>
+    <p onClick={()=>setEdit(true)} style={{cursor:"pointer"}}>
+      {text}
+    </p>
   );
 }
