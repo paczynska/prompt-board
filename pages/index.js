@@ -152,14 +152,15 @@ export default function Home() {
               >
                 
               {item.fileType === "video" ? (
-  <video 
-    src={item.image}
-    controls
-    style={{
-      width: "100%",
-      borderRadius: "12px"
-    }}
-  />
+ <video 
+  src={item.image}
+  controls
+  style={{
+    width: "100%",
+    borderRadius: "12px",
+    maxHeight: "400px"
+  }}
+/>
 ) : (
   <img 
     src={item.image} 
