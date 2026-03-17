@@ -96,9 +96,8 @@ export default function Home() {
             onChange={(e)=>setMediaType(e.target.value)}
             style={{marginBottom:"10px", padding:"8px"}}
           >
-          <option value="chatgpt">🤖 ChatGPT</option>
-          <option value="nanobanana">🍌 NanoBanana</option>
-          <option value="veo3">🎬 Veo3</option>
+        <option value="chatgpt">🤖 ChatGPT</option>
+        <option value="nanobanana">🍌 NanoBanana</option>
           </select>
 
           {/* OPIS */}
