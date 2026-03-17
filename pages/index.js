@@ -6,8 +6,8 @@ export default function Home() {
   const [prompts, setPrompts] = useState([]);
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState("chatgpt");
- const [file, setFile] = useState(null);
-const [mediaType, setMediaType] = useState("image");
+  const [file, setFile] = useState(null);
+  const [mediaType, setMediaType] = useState("image");
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
@@ -44,7 +44,7 @@ const [mediaType, setMediaType] = useState("image");
         image: data.secure_url,
         prompt,
         type,
-       fileType: mediaType,
+        fileType: mediaType,
         createdAt: new Date()
       });
 
@@ -88,35 +88,25 @@ const [mediaType, setMediaType] = useState("image");
           boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
         }}>
 
- <select 
-  value={mediaType} 
-  onChange={(e)=>setMediaType(e.target.value)}
-  style={{marginBottom:"10px", padding:"8px"}}
->
-  <option value="image">📸 Obraz</option>
-  <option value="video">🎬 Video (Veo3)</option>
-</select>
-          <br/>
-
-          <button 
-            onClick={savePrompt}
-            style={{
-              background:"linear-gradient(135deg,#ff4d4d,#ff0080)",
-              border:"none",
-              padding:"10px 20px",
-              borderRadius:"12px",
-              color:"white",
-              cursor:"pointer"
-            }}
+          {/* WYBÓR MEDIA */}
+          <select 
+            value={mediaType} 
+            onChange={(e)=>setMediaType(e.target.value)}
+            style={{marginBottom:"10px", padding:"8px"}}
           >
-            💾 Zapisz
-          </button>
-        </div>
+            <option value="image">📸 Obraz</option>
+            <option value="video">🎬 Video (Veo3)</option>
+          </select>
 
-          
-         <input 
-  type="file" 
-  accept={mediaType === "video" ? "video/mp4" : "image/*"}
+          {/* OPIS */}
+          <p style={{fontSize:"12px", opacity:0.6}}>
+            {mediaType === "video" ? "🎬 Dodaj video z Veo3" : "📸 Dodaj obraz"}
+          </p>
+
+          {/* INPUT */}
+          <input 
+            type="file" 
+            accept={mediaType === "video" ? "video/mp4" : "image/*"}
             onChange={(e) => setFile(e.target.files[0])}
             style={{marginBottom:"10px"}}
           />
@@ -134,15 +124,14 @@ const [mediaType, setMediaType] = useState("image");
             }}
           />
 
-         <select 
-  value={mediaType} 
-  onChange={(e)=>setMediaType(e.target.value)}
-  style={{marginBottom:"10px", padding:"8px"}}
->
-  <option value="image">📸 Obraz</option>
-  <option value="video">🎬 Video (Veo3)</option>
-</select>
-          <br/>
+          <select 
+            value={type} 
+            onChange={e=>setType(e.target.value)}
+            style={{marginBottom:"10px", padding:"8px"}}
+          >
+            <option value="chatgpt">🤖 ChatGPT</option>
+            <option value="nanobanana">🍌 NanoBanana</option>
+          </select>
 
           <button 
             onClick={savePrompt}
