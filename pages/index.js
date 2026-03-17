@@ -92,13 +92,14 @@ const savePrompt = async () => {
     e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.6)";
   }}
 >
-        <img 
+       <img 
   src={item.image} 
   alt="img"
-  style={{
-    width: "100%",
-    transition: "transform 0.4s ease"
-  }}
+style={{
+  width: "100%",
+  height: "200px",
+  objectFit: "cover"
+}}
   onMouseEnter={(e) => {
     e.currentTarget.style.transform = "scale(1.1)";
   }}
