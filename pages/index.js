@@ -52,7 +52,14 @@ const savePrompt = async () => {
   };
 
   return (
-    <div style={{padding:20, background:"black", minHeight:"100vh", color:"white"}}>
+    <div style={{
+  padding: "20px",
+  background: "black",
+  minHeight: "100vh",
+  color: "white",
+  maxWidth: "1200px",
+  margin: "0 auto"
+}}>
       <h1>🔥 Prompt Board</h1>
 
       <input type="file" onChange={(e) => setFile(e.target.files[0])} />
