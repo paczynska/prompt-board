@@ -7,7 +7,6 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState("chatgpt");
   const [file, setFile] = useState(null);
-  const [columns, setColumns] = useState(4);
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
@@ -20,32 +19,42 @@ export default function Home() {
   }, []);
 
   const savePrompt = async () => {
-    if (!file) return alert("Dodaj zdjęcie!");
+    if (!file) return alert("Dodaj plik!");
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "ml_default");
-    formData.append("resource_type", "auto");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "ml_default");
+      formData.append("resource_type", "auto");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/auto/upload", {
-      method: "POST",
-      body: formData
-    });
+      const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/auto/upload", {
+        method: "POST",
+        body: formData
+      });
 
-    const data = await res.json();
-    const imageUrl = data.secure_url;
+      const data = await res.json();
 
-   await addDoc(collection(db, "prompts"), {
-  image: imageUrl,
-  prompt,
-  type,
-  fileType: file.type.startsWith("video") ? "video" : "image",
-  createdAt: new Date()
-});
+      if (!data.secure_url) {
+        alert("Błąd uploadu!");
+        return;
+      }
 
-    setFile(null);
-    setPrompt("");
-    loadPrompts();
+      await addDoc(collection(db, "prompts"), {
+        image: data.secure_url,
+        prompt,
+        type,
+        fileType: file.type.startsWith("video") ? "video" : "image",
+        createdAt: new Date()
+      });
+
+      setFile(null);
+      setPrompt("");
+      loadPrompts();
+
+    } catch (err) {
+      console.error(err);
+      alert("Coś poszło nie tak 😅");
+    }
   };
 
   const editPrompt = async (id, newPrompt) => {
@@ -62,10 +71,10 @@ export default function Home() {
     }}>
       
       <div style={{
-  padding: "20px 40px",
-  width: "100%",
-  color: "white"
-}}>
+        padding: "20px 40px",
+        width: "100%",
+        color: "white"
+      }}>
 
         <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
@@ -78,11 +87,11 @@ export default function Home() {
           boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
         }}>
           <input 
-  type="file" 
-  accept="image/*,video/mp4"
-  onChange={(e) => setFile(e.target.files[0])}
-  style={{marginBottom:"10px"}}
-/>
+            type="file" 
+            accept="image/*,video/mp4"
+            onChange={(e) => setFile(e.target.files[0])}
+            style={{marginBottom:"10px"}}
+          />
 
           <textarea 
             placeholder="Wpisz prompt..." 
@@ -124,80 +133,78 @@ export default function Home() {
         </div>
 
         {/* GRID */}
-<div style={{
-  columnCount: 4,
-  columnGap: "20px"
-}}>
-          {prompts.map((item) => {
-            return (
-              <div 
-                key={item.id} 
-                style={{
-                  breakInside: "avoid",
-                  marginBottom: "25px",
-                  background: "#1a1a1a",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-                  transition: "0.3s"
-                }}
-                onMouseEnter={(e)=>{
-                  e.currentTarget.style.transform="translateY(-8px)";
-                  e.currentTarget.style.boxShadow="0 20px 40px rgba(0,0,0,0.8)";
-                }}
-                onMouseLeave={(e)=>{
-                  e.currentTarget.style.transform="translateY(0)";
-                  e.currentTarget.style.boxShadow="0 10px 25px rgba(0,0,0,0.5)";
-                }}
-              >
-                
+        <div style={{
+          columnCount: 4,
+          columnGap: "20px"
+        }}>
+          {prompts.map((item) => (
+            <div 
+              key={item.id} 
+              style={{
+                breakInside: "avoid",
+                marginBottom: "25px",
+                background: "#1a1a1a",
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+                transition: "0.3s"
+              }}
+              onMouseEnter={(e)=>{
+                e.currentTarget.style.transform="translateY(-8px)";
+                e.currentTarget.style.boxShadow="0 20px 40px rgba(0,0,0,0.8)";
+              }}
+              onMouseLeave={(e)=>{
+                e.currentTarget.style.transform="translateY(0)";
+                e.currentTarget.style.boxShadow="0 10px 25px rgba(0,0,0,0.5)";
+              }}
+            >
+              
               {item.fileType === "video" ? (
- <video 
-  src={item.image}
-  controls
-  style={{
-    width: "100%",
-    borderRadius: "12px",
-    maxHeight: "400px"
-  }}
-/>
-) : (
-  <img 
-    src={item.image} 
-    alt="img"
-    style={{
-      width: "100%",
-      height: "auto",
-      borderRadius: "12px",
-      display: "block"
-    }}
-  />
-)}
+                <video 
+                  src={item.image}
+                  controls
+                  style={{
+                    width: "100%",
+                    maxHeight: "400px",
+                    borderRadius: "12px"
+                  }}
+                />
+              ) : (
+                <img 
+                  src={item.image} 
+                  alt="img"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    borderRadius: "12px",
+                    display: "block"
+                  }}
+                />
+              )}
 
-                <div style={{
-  padding:"10px",
-  background:"#1a1a1a"
-}}>
-                  <Editable 
-                    text={item.prompt.length > 120 
-                      ? item.prompt.slice(0,120) + "..." 
-                      : item.prompt
-                    } 
-                    onSave={(t)=>editPrompt(item.id, t)} 
-                  />
+              <div style={{
+                padding:"10px",
+                background:"#1a1a1a"
+              }}>
+                <Editable 
+                  text={item.prompt.length > 120 
+                    ? item.prompt.slice(0,120) + "..." 
+                    : item.prompt
+                  } 
+                  onSave={(t)=>editPrompt(item.id, t)} 
+                />
 
-                  <p style={{
-                    opacity: 0.6,
-                    fontSize: "12px",
-                    marginTop: "5px"
-                  }}>
-                    {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
-                  </p>
-                </div>
-
+                <p style={{
+                  opacity: 0.6,
+                  fontSize: "12px",
+                  marginTop: "5px"
+                }}>
+                  {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
+                </p>
               </div>
-            );
-          })}
+
+            </div>
+          ))}
         </div>
 
       </div>
