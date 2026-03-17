@@ -66,6 +66,11 @@ export default function Home() {
     loadPrompts();
   };
 
+  const copyPrompt = (text) => {
+    navigator.clipboard.writeText(text);
+    alert("Skopiowano prompt 🔥");
+  };
+
   return (
     <div style={{
       background: "#000",
@@ -92,7 +97,6 @@ export default function Home() {
           <select 
             value={mediaType} 
             onChange={(e)=>setMediaType(e.target.value)}
-            style={{marginBottom:"10px", padding:"8px"}}
           >
             <option value="image">📸 Obraz</option>
             <option value="video">🎬 Video (Veo3)</option>
@@ -127,7 +131,7 @@ export default function Home() {
           {preview && (
             <div style={{marginTop:"10px"}}>
               {mediaType === "video" ? (
-                <video src={preview} controls style={{width:"100%", maxHeight:"300px"}} />
+                <video src={preview} controls style={{width:"100%"}} />
               ) : (
                 <img src={preview} style={{width:"100%"}} />
               )}
@@ -145,7 +149,6 @@ export default function Home() {
             value={type} 
             onChange={e=>setType(e.target.value)}
             disabled={mediaType === "video"}
-            style={{marginTop:"10px"}}
           >
             <option value="chatgpt">🤖 ChatGPT</option>
             <option value="nanobanana">🍌 NanoBanana</option>
@@ -179,6 +182,22 @@ export default function Home() {
 
               <Editable text={item.prompt} onSave={(t)=>editPrompt(item.id, t)} />
 
+              {/* PRZYCISK KOPIUJ */}
+              <button 
+                onClick={()=>copyPrompt(item.prompt)}
+                style={{
+                  marginTop:"5px",
+                  background:"#333",
+                  border:"none",
+                  padding:"5px 10px",
+                  borderRadius:"6px",
+                  color:"white",
+                  cursor:"pointer"
+                }}
+              >
+                📋 Kopiuj prompt
+              </button>
+
               <p style={{fontSize:"12px", opacity:0.6}}>
                 {item.type === "chatgpt" && "🤖 ChatGPT"}
                 {item.type === "nanobanana" && "🍌 NanoBanana"}
@@ -209,16 +228,20 @@ function Editable({text, onSave}) {
 
   return (
     <div>
-      <p onClick={()=>setEdit(true)} style={{cursor:"pointer"}}>
+      <p>
         {expanded ? text : text.slice(0,120)}
         {!expanded && text.length > 120 && "..."}
       </p>
 
-      {text.length > 120 && (
-        <button onClick={()=>setExpanded(!expanded)}>
-          {expanded ? "▲ zwiń" : "▼ czytaj więcej"}
-        </button>
-      )}
+      <div style={{display:"flex", gap:"10px"}}>
+        {text.length > 120 && (
+          <button onClick={()=>setExpanded(!expanded)}>
+            {expanded ? "▲ zwiń" : "▼ czytaj więcej"}
+          </button>
+        )}
+
+        <button onClick={()=>setEdit(true)}>✏️ edytuj</button>
+      </div>
     </div>
   );
 }
