@@ -154,7 +154,13 @@ export default function Home() {
               />
 
               <div style={{padding:"10px"}}>
-                <Editable text={item.prompt} onSave={(t)=>editPrompt(item.id, t)} />
+               <Editable 
+  text={item.prompt.length > 120 
+    ? item.prompt.slice(0,120) + "..." 
+    : item.prompt
+  } 
+  onSave={(t)=>editPrompt(item.id, t)} 
+/>
                 <p style={{opacity:0.6, fontSize:"12px"}}>
                   {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
                 </p>
