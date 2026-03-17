@@ -72,7 +72,26 @@ const savePrompt = async () => {
      <div>
   {prompts.map((item) => {
     return (
-      <div key={item.id} style={{ marginTop: 20 }}>
+      <div 
+  key={item.id} 
+  style={{
+    marginTop: 20,
+    borderRadius: "16px",
+    overflow: "hidden",
+    background: "#1a1a1a",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.6)",
+    transition: "all 0.3s ease",
+    cursor: "pointer"
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = "scale(1.03)";
+    e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.8)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.6)";
+  }}
+>
         <img src={item.image} width="200" alt="img" />
         <Editable text={item.prompt} onSave={(t) => editPrompt(item.id, t)} />
         <p>{item.type}</p>
