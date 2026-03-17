@@ -121,10 +121,10 @@ export default function Home() {
         </div>
 
         {/* GRID */}
-        <div style={{
-        columnCount: 4,
-          columnGap: "20px"
-        }}>
+<div style={{
+  columnCount: 4,
+  columnGap: "20px"
+}}>
           {prompts.map((item) => {
             return (
               <div 
