@@ -27,7 +27,7 @@ export default function Home() {
     formData.append("upload_preset", "ml_default");
     formData.append("resource_type", "auto");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/image/upload", {
+    const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/auto/upload", {
       method: "POST",
       body: formData
     });
