@@ -50,6 +50,7 @@ export default function Home() {
       });
 
       setFile(null);
+      setPreview(null);
       setPrompt("");
       loadPrompts();
 
@@ -92,14 +93,7 @@ export default function Home() {
           {/* WYBÓR MEDIA */}
           <select 
             value={mediaType} 
-          onChange={(e) => {
-  const selected = e.target.files[0];
-  setFile(selected);
-
-  if (selected) {
-    setPreview(URL.createObjectURL(selected));
-  }
-}}
+            onChange={(e)=>setMediaType(e.target.value)}
             style={{marginBottom:"10px", padding:"8px"}}
           >
             <option value="image">📸 Obraz</option>
@@ -115,9 +109,42 @@ export default function Home() {
           <input 
             type="file" 
             accept={mediaType === "video" ? "video/mp4" : "image/*"}
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => {
+              const selected = e.target.files[0];
+              setFile(selected);
+
+              if (selected) {
+                setPreview(URL.createObjectURL(selected));
+              }
+            }}
             style={{marginBottom:"10px"}}
           />
+
+          {/* PREVIEW */}
+          {preview && (
+            <div style={{marginTop:"10px"}}>
+              {mediaType === "video" ? (
+                <video 
+                  src={preview}
+                  controls
+                  style={{
+                    width: "100%",
+                    maxHeight: "300px",
+                    borderRadius: "12px"
+                  }}
+                />
+              ) : (
+                <img 
+                  src={preview}
+                  alt="preview"
+                  style={{
+                    width: "100%",
+                    borderRadius: "12px"
+                  }}
+                />
+              )}
+            </div>
+          )}
 
           <textarea 
             placeholder="Wpisz prompt..." 
