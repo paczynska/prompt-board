@@ -92,7 +92,20 @@ const savePrompt = async () => {
     e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.6)";
   }}
 >
-        <img src={item.image} width="200" alt="img" />
+        <img 
+  src={item.image} 
+  alt="img"
+  style={{
+    width: "100%",
+    transition: "transform 0.4s ease"
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = "scale(1.1)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = "scale(1)";
+  }}
+/>
         <Editable text={item.prompt} onSave={(t) => editPrompt(item.id, t)} />
         <p>{item.type}</p>
       </div>
