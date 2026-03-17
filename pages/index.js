@@ -45,17 +45,6 @@ const savePrompt = async () => {
   setPrompt("");
   loadPrompts();
 };
-  
-    await addDoc(collection(db, "prompts"), {
-      image,
-      prompt,
-      type,
-      createdAt: new Date()
-    });
-    setImage("");
-    setPrompt("");
-    loadPrompts();
-  };
 
   const editPrompt = async (id, newPrompt) => {
     const ref = doc(db, "prompts", id);
