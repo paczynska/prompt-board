@@ -60,7 +60,7 @@ export default function Home() {
       
       <div style={{
         padding: "20px",
-        maxWidth: "1400px",
+        maxWidth: "100%",
         margin: "0 auto",
         color: "white"
       }}>
