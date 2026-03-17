@@ -42,11 +42,6 @@ export default function Home() {
   fileType: file.type.startsWith("video") ? "video" : "image",
   createdAt: new Date()
 });
-      image: imageUrl,
-      prompt,
-      type,
-      createdAt: new Date()
-    });
 
     setFile(null);
     setPrompt("");
