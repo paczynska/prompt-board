@@ -121,7 +121,7 @@ export default function Home() {
 
         {/* GRID */}
         <div style={{
-          columnCount: window.innerWidth < 768 ? 1 : window.innerWidth < 1100 ? 2 : 3,
+        columnCount: window.innerWidth < 768 ? 1 : window.innerWidth < 1100 ? 2 : 4,
           columnGap: "20px"
         }}>
           {prompts.map((item) => {
