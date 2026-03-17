@@ -87,8 +87,8 @@ export default function Home() {
           boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
         }}>
           <input 
-            type="file" 
-            accept="image/*,video/mp4"
+  type="file" 
+  accept="image/*,video/mp4"
             onChange={(e) => setFile(e.target.files[0])}
             style={{marginBottom:"10px"}}
           />
