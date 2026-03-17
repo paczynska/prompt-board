@@ -148,16 +148,16 @@ export default function Home() {
                 }}
               >
                 
-                <img 
-                  src={item.image} 
-                  alt="img"
-                  style={{
-                    width: "100%",
-                    height: "220px"
-                    objectFit: "cover"
-                    display: "block"
-                  }}
-                />
+              <img 
+  src={item.image} 
+  alt="img"
+  style={{
+    width: "100%",
+    height: "auto",
+    borderRadius: "12px",
+    display: "block"
+  }}
+/>
 
                 <div style={{padding:"10px"}}>
                   <Editable 
