@@ -92,7 +92,14 @@ export default function Home() {
           {/* WYBÓR MEDIA */}
           <select 
             value={mediaType} 
-            onChange={(e)=>setMediaType(e.target.value)}
+          onChange={(e) => {
+  const selected = e.target.files[0];
+  setFile(selected);
+
+  if (selected) {
+    setPreview(URL.createObjectURL(selected));
+  }
+}}
             style={{marginBottom:"10px", padding:"8px"}}
           >
             <option value="image">📸 Obraz</option>
