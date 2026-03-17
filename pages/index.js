@@ -52,138 +52,139 @@ export default function Home() {
   };
 
   return (
-   <div style={{
-  background: "#000",
-  minHeight: "100vh",
-  width: "100%"
-}}>
-  
-  <div style={{
-    padding: "20px",
-    maxWidth: "1200px",
-    margin: "0 auto",
-    color: "white"
-  }}>
-
-      <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
-
-      {/* FORM */}
+    <div style={{
+      background: "#000",
+      minHeight: "100vh",
+      width: "100%"
+    }}>
+      
       <div style={{
-        background: "#1f1f1f",
         padding: "20px",
-        borderRadius: "16px",
-        marginBottom: "30px",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+        maxWidth: "1400px",
+        margin: "0 auto",
+        color: "white"
       }}>
-        <input 
-          type="file" 
-          onChange={(e) => setFile(e.target.files[0])}
-          style={{marginBottom:"10px"}}
-        />
 
-        <textarea 
-          placeholder="Wpisz prompt..." 
-          value={prompt} 
-          onChange={e=>setPrompt(e.target.value)}
-          style={{
-            width:"100%",
-            padding:"10px",
-            borderRadius:"10px",
-            marginBottom:"10px",
-            border:"none"
-          }}
-        />
+        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
-        <select 
-          value={type} 
-          onChange={e=>setType(e.target.value)}
-          style={{marginBottom:"10px", padding:"8px"}}
-        >
-          <option value="chatgpt">🤖 ChatGPT</option>
-          <option value="nanobanana">🍌 NanoBanana</option>
-        </select>
+        {/* FORM */}
+        <div style={{
+          background: "#1f1f1f",
+          padding: "20px",
+          borderRadius: "16px",
+          marginBottom: "30px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+        }}>
+          <input 
+            type="file" 
+            onChange={(e) => setFile(e.target.files[0])}
+            style={{marginBottom:"10px"}}
+          />
 
-        <br/>
+          <textarea 
+            placeholder="Wpisz prompt..." 
+            value={prompt} 
+            onChange={e=>setPrompt(e.target.value)}
+            style={{
+              width:"100%",
+              padding:"10px",
+              borderRadius:"10px",
+              marginBottom:"10px",
+              border:"none"
+            }}
+          />
 
-        <button 
-          onClick={savePrompt}
-          style={{
-            background:"linear-gradient(135deg,#ff4d4d,#ff0080)",
-            border:"none",
-            padding:"10px 20px",
-            borderRadius:"12px",
-            color:"white",
-            cursor:"pointer"
-          }}
-        >
-          💾 Zapisz
-        </button>
-      </div>
+          <select 
+            value={type} 
+            onChange={e=>setType(e.target.value)}
+            style={{marginBottom:"10px", padding:"8px"}}
+          >
+            <option value="chatgpt">🤖 ChatGPT</option>
+            <option value="nanobanana">🍌 NanoBanana</option>
+          </select>
 
-      {/* GRID */}
-      <div style={{
-        columnCount: 3,
-        columnGap: "20px"
-      }}>
-        {prompts.map((item) => {
-          return (
-            <div 
-  key={item.id} 
-  style={{
-    breakInside: "avoid",
-    marginBottom: "25px",
-    background: "#1a1a1a",
-    borderRadius: "16px",
-    overflow: "hidden",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-    transition: "0.3s"
-  }}
-  onMouseEnter={(e)=>{
-    e.currentTarget.style.transform="translateY(-8px)";
-    e.currentTarget.style.boxShadow="0 20px 40px rgba(0,0,0,0.8)";
-  }}
-  onMouseLeave={(e)=>{
-    e.currentTarget.style.transform="translateY(0)";
-    e.currentTarget.style.boxShadow="0 10px 25px rgba(0,0,0,0.5)";
-  }}
->
-             <img 
-  src={item.image} 
-  alt="img"
-  style={{
-  breakInside: "avoid",
-  marginBottom: "25px",
-  background: "#1a1a1a",
-  borderRadius: "16px",
-  overflow: "hidden",
-  boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-  transition: "0.3s"
-}}
-/>
-              <div style={{padding:"10px"}}>
-               <Editable 
-  text={item.prompt.length > 120 
-    ? item.prompt.slice(0,120) + "..." 
-    : item.prompt
-  } 
-  onSave={(t)=>editPrompt(item.id, t)} 
-/>
-               <p style={{
-  opacity: 0.6,
-  fontSize: "12px",
-  marginTop: "5px"
-}}>
-  {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
-</p>
+          <br/>
+
+          <button 
+            onClick={savePrompt}
+            style={{
+              background:"linear-gradient(135deg,#ff4d4d,#ff0080)",
+              border:"none",
+              padding:"10px 20px",
+              borderRadius:"12px",
+              color:"white",
+              cursor:"pointer"
+            }}
+          >
+            💾 Zapisz
+          </button>
+        </div>
+
+        {/* GRID */}
+        <div style={{
+          columnCount: window.innerWidth < 768 ? 1 : window.innerWidth < 1100 ? 2 : 3,
+          columnGap: "20px"
+        }}>
+          {prompts.map((item) => {
+            return (
+              <div 
+                key={item.id} 
+                style={{
+                  breakInside: "avoid",
+                  marginBottom: "25px",
+                  background: "#1a1a1a",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+                  transition: "0.3s"
+                }}
+                onMouseEnter={(e)=>{
+                  e.currentTarget.style.transform="translateY(-8px)";
+                  e.currentTarget.style.boxShadow="0 20px 40px rgba(0,0,0,0.8)";
+                }}
+                onMouseLeave={(e)=>{
+                  e.currentTarget.style.transform="translateY(0)";
+                  e.currentTarget.style.boxShadow="0 10px 25px rgba(0,0,0,0.5)";
+                }}
+              >
+                
+                <img 
+                  src={item.image} 
+                  alt="img"
+                  style={{
+                    width: "100%",
+                    height: "220px",
+                    objectFit: "cover",
+                    display: "block"
+                  }}
+                />
+
+                <div style={{padding:"10px"}}>
+                  <Editable 
+                    text={item.prompt.length > 120 
+                      ? item.prompt.slice(0,120) + "..." 
+                      : item.prompt
+                    } 
+                    onSave={(t)=>editPrompt(item.id, t)} 
+                  />
+
+                  <p style={{
+                    opacity: 0.6,
+                    fontSize: "12px",
+                    marginTop: "5px"
+                  }}>
+                    {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
+                  </p>
+                </div>
+
               </div>
+            );
+          })}
+        </div>
 
-            </div>
-          );
-        })}
-          </div>
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 function Editable({text, onSave}) {
