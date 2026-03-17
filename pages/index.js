@@ -21,10 +21,7 @@ export default function Home() {
   }, []);
 
   const savePrompt = async () => {
-    if (!file) {
-      alert("Dodaj plik!");
-      return;
-    }
+    if (!file) return alert("Dodaj plik!");
 
     try {
       const formData = new FormData();
@@ -55,7 +52,6 @@ export default function Home() {
       setFile(null);
       setPreview(null);
       setPrompt("");
-
       loadPrompts();
 
     } catch (err) {
@@ -73,16 +69,15 @@ export default function Home() {
   return (
     <div style={{
       background: "#000",
-      minHeight: "100vh",
-      width: "100%"
+      minHeight: "100vh"
     }}>
       
       <div style={{
-  padding: "20px",
-  maxWidth: "1200px",
-  margin: "0 auto",
-  color: "white"
-}}>
+        padding: "20px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        color: "white"
+      }}>
 
         <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
@@ -91,11 +86,9 @@ export default function Home() {
           background: "#1f1f1f",
           padding: "20px",
           borderRadius: "16px",
-          marginBottom: "30px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+          marginBottom: "30px"
         }}>
 
-          {/* WYBÓR MEDIA */}
           <select 
             value={mediaType} 
             onChange={(e)=>setMediaType(e.target.value)}
@@ -107,11 +100,10 @@ export default function Home() {
 
           <p style={{fontSize:"12px", opacity:0.6}}>
             {mediaType === "video"
-              ? "🎬 Dodaj video – automatycznie Veo3"
+              ? "🎬 Video = automatycznie Veo3"
               : "📸 Dodaj obraz"}
           </p>
 
-          {/* INPUT (NAPRAWIONY) */}
           <input 
             key={mediaType}
             type="file" 
@@ -130,31 +122,14 @@ export default function Home() {
                 setMediaType("image");
               }
             }}
-            style={{marginBottom:"10px"}}
           />
 
-          {/* PREVIEW */}
           {preview && (
             <div style={{marginTop:"10px"}}>
               {mediaType === "video" ? (
-                <video 
-                  src={preview}
-                  controls
-                  style={{
-                    width: "100%",
-                    maxHeight: "300px",
-                    borderRadius: "12px"
-                  }}
-                />
+                <video src={preview} controls style={{width:"100%", maxHeight:"300px"}} />
               ) : (
-                <img 
-                  src={preview}
-                  alt="preview"
-                  style={{
-                    width: "100%",
-                    borderRadius: "12px"
-                  }}
-                />
+                <img src={preview} style={{width:"100%"}} />
               )}
             </div>
           )}
@@ -163,109 +138,52 @@ export default function Home() {
             placeholder="Wpisz prompt..." 
             value={prompt} 
             onChange={e=>setPrompt(e.target.value)}
-            style={{
-              width:"100%",
-              padding:"10px",
-              borderRadius:"10px",
-              marginBottom:"10px",
-              border:"none"
-            }}
+            style={{width:"100%", marginTop:"10px"}}
           />
 
-          {/* WYBÓR AI */}
           <select 
             value={type} 
             onChange={e=>setType(e.target.value)}
             disabled={mediaType === "video"}
-            style={{marginBottom:"10px", padding:"8px"}}
+            style={{marginTop:"10px"}}
           >
             <option value="chatgpt">🤖 ChatGPT</option>
             <option value="nanobanana">🍌 NanoBanana</option>
             <option value="veo3">🎬 Veo3</option>
           </select>
 
-          <button 
-            onClick={savePrompt}
-            style={{
-              background:"linear-gradient(135deg,#ff4d4d,#ff0080)",
-              border:"none",
-              padding:"10px 20px",
-              borderRadius:"12px",
-              color:"white",
-              cursor:"pointer"
-            }}
-          >
-            💾 Zapisz
-          </button>
+          <br/><br/>
+
+          <button onClick={savePrompt}>💾 Zapisz</button>
         </div>
 
         {/* GRID */}
         <div style={{
-          columnCount: 4,
+          columnCount: 3,
           columnGap: "20px"
         }}>
           {prompts.map((item) => (
-            <div 
-              key={item.id} 
-              style={{
-                breakInside: "avoid",
-                marginBottom: "25px",
-                background: "#1a1a1a",
-                borderRadius: "16px",
-                overflow: "hidden",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-                transition: "0.3s"
-              }}
-              onMouseEnter={(e)=>{
-                e.currentTarget.style.transform="translateY(-8px)";
-                e.currentTarget.style.boxShadow="0 20px 40px rgba(0,0,0,0.8)";
-              }}
-              onMouseLeave={(e)=>{
-                e.currentTarget.style.transform="translateY(0)";
-                e.currentTarget.style.boxShadow="0 10px 25px rgba(0,0,0,0.5)";
-              }}
-            >
+            <div key={item.id} style={{
+              breakInside:"avoid",
+              marginBottom:"20px",
+              background:"#1a1a1a",
+              borderRadius:"12px",
+              padding:"10px"
+            }}>
               
               {item.fileType === "video" ? (
-                <video 
-                  src={item.image}
-                  controls
-                  style={{
-                    width: "100%",
-                    maxHeight: "400px",
-                    borderRadius: "12px"
-                  }}
-                />
+                <video src={item.image} controls style={{width:"100%"}} />
               ) : (
-                <img 
-                  src={item.image} 
-                  alt="img"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    borderRadius: "12px",
-                    display: "block"
-                  }}
-                />
+                <img src={item.image} style={{width:"100%"}} />
               )}
 
-              <div style={{padding:"10px"}}>
-               <Editable 
-                text={item.prompt} 
-                  onSave={(t)=>editPrompt(item.id, t)} 
-                />
+              <Editable text={item.prompt} onSave={(t)=>editPrompt(item.id, t)} />
 
-                <p style={{
-                  opacity: 0.6,
-                  fontSize: "12px",
-                  marginTop: "5px"
-                }}>
-                  {item.type === "chatgpt" && "🤖 ChatGPT"}
-                  {item.type === "nanobanana" && "🍌 NanoBanana"}
-                  {item.type === "veo3" && "🎬 Veo3"}
-                </p>
-              </div>
-
+              <p style={{fontSize:"12px", opacity:0.6}}>
+                {item.type === "chatgpt" && "🤖 ChatGPT"}
+                {item.type === "nanobanana" && "🍌 NanoBanana"}
+                {item.type === "veo3" && "🎬 Veo3"}
+              </p>
             </div>
           ))}
         </div>
@@ -278,15 +196,29 @@ export default function Home() {
 function Editable({text, onSave}) {
   const [edit, setEdit] = useState(false);
   const [val, setVal] = useState(text);
+  const [expanded, setExpanded] = useState(false);
 
-  return edit ? (
+  if (edit) {
+    return (
+      <div>
+        <textarea value={val} onChange={e=>setVal(e.target.value)} />
+        <button onClick={()=>{onSave(val); setEdit(false)}}>💾</button>
+      </div>
+    );
+  }
+
+  return (
     <div>
-      <textarea value={val} onChange={e=>setVal(e.target.value)} />
-      <button onClick={()=>{onSave(val); setEdit(false)}}>💾</button>
+      <p onClick={()=>setEdit(true)} style={{cursor:"pointer"}}>
+        {expanded ? text : text.slice(0,120)}
+        {!expanded && text.length > 120 && "..."}
+      </p>
+
+      {text.length > 120 && (
+        <button onClick={()=>setExpanded(!expanded)}>
+          {expanded ? "▲ zwiń" : "▼ czytaj więcej"}
+        </button>
+      )}
     </div>
-  ) : (
-    <p onClick={()=>setEdit(true)} style={{cursor:"pointer"}}>
-      {text}
-    </p>
   );
 }
