@@ -35,7 +35,13 @@ export default function Home() {
     const data = await res.json();
     const imageUrl = data.secure_url;
 
-    await addDoc(collection(db, "prompts"), {
+   await addDoc(collection(db, "prompts"), {
+  image: imageUrl,
+  prompt,
+  type,
+  fileType: file.type.startsWith("video") ? "video" : "image",
+  createdAt: new Date()
+});
       image: imageUrl,
       prompt,
       type,
