@@ -96,13 +96,14 @@ export default function Home() {
             onChange={(e)=>setMediaType(e.target.value)}
             style={{marginBottom:"10px", padding:"8px"}}
           >
-        <option value="chatgpt">🤖 ChatGPT</option>
-        <option value="nanobanana">🍌 NanoBanana</option>
+            <option value="image">📸 Obraz</option>
+            <option value="video">🎬 Video (Veo3)</option>
           </select>
 
-          {/* OPIS */}
           <p style={{fontSize:"12px", opacity:0.6}}>
-            {mediaType === "video" ? "🎬 Dodaj video z Veo3" : "📸 Dodaj obraz"}
+            {mediaType === "video"
+              ? "🎬 Dodaj video – automatycznie Veo3"
+              : "📸 Dodaj obraz"}
           </p>
 
           {/* INPUT */}
@@ -110,20 +111,20 @@ export default function Home() {
             type="file" 
             accept={mediaType === "video" ? "video/mp4" : "image/*"}
             onChange={(e) => {
-  const selected = e.target.files[0];
-  setFile(selected);
+              const selected = e.target.files[0];
+              setFile(selected);
 
-  if (selected) {
-    setPreview(URL.createObjectURL(selected));
+              if (selected) {
+                setPreview(URL.createObjectURL(selected));
 
-    if (selected.type.startsWith("video")) {
-      setMediaType("video");
-      setType("veo3"); // 🔥 AUTO VEO3
-    } else {
-      setMediaType("image");
-    }
-  }
-}}
+                if (selected.type.startsWith("video")) {
+                  setMediaType("video");
+                  setType("veo3");
+                } else {
+                  setMediaType("image");
+                }
+              }
+            }}
             style={{marginBottom:"10px"}}
           />
 
@@ -166,14 +167,23 @@ export default function Home() {
             }}
           />
 
+          {/* WYBÓR AI */}
           <select 
             value={type} 
             onChange={e=>setType(e.target.value)}
+            disabled={mediaType === "video"}
             style={{marginBottom:"10px", padding:"8px"}}
           >
             <option value="chatgpt">🤖 ChatGPT</option>
             <option value="nanobanana">🍌 NanoBanana</option>
+            <option value="veo3">🎬 Veo3</option>
           </select>
+
+          <p style={{fontSize:"12px", opacity:0.6}}>
+            {mediaType === "video"
+              ? "🎬 Video zawsze zapisuje się jako Veo3"
+              : "📸 Wybierz generator obrazu"}
+          </p>
 
           <button 
             onClick={savePrompt}
@@ -257,7 +267,9 @@ export default function Home() {
                   fontSize: "12px",
                   marginTop: "5px"
                 }}>
-                  {item.type === "chatgpt" ? "🤖 ChatGPT" : "🍌 NanoBanana"}
+                  {item.type === "chatgpt" && "🤖 ChatGPT"}
+                  {item.type === "nanobanana" && "🍌 NanoBanana"}
+                  {item.type === "veo3" && "🎬 Veo3"}
                 </p>
               </div>
 
