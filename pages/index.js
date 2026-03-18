@@ -67,7 +67,11 @@ export default function Home() {
   };
 
   return (
-    <div style={{ background: "#000", minHeight: "100vh" }}>
+   <div style={{ 
+  background: "#000", 
+  minHeight: "100vh",
+  fontFamily: "inherit"
+}}>
       
       <div style={{
         padding: "20px",
