@@ -80,7 +80,7 @@ export default function Home() {
         color: "white"
       }}>
 
-        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
+        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 PLANETA PROMPTÓW</h1>
 
         {/* FORM */}
         <div style={{
