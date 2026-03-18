@@ -29,7 +29,6 @@ export default function Home() {
     else setType("chatgpt");
   }, [mediaType]);
 
-  // 🔥 RESPONSIVE GRID
   useEffect(() => {
     const update = () => {
       if (window.innerWidth < 600) setColumns(1);
@@ -105,7 +104,6 @@ export default function Home() {
 
         <h1 style={{fontSize:"32px"}}>🔥 PLANETA PROMPTÓW</h1>
 
-        {/* FORM */}
         <div style={cardStyle}>
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
             <option value="image">📸 OBRAZ</option>
@@ -134,51 +132,22 @@ export default function Home() {
               : <img src={preview} style={previewStyle}/>
           )}
 
-          <textarea 
-            value={prompt}
-            onChange={e=>setPrompt(e.target.value)}
-            placeholder="✨ Wpisz prompt..."
-            style={textareaStyle}
-          />
-
-          <select value={type} onChange={e=>setType(e.target.value)} style={inputStyle}>
-            {mediaType === "video"
-              ? <option value="veo3">🎬 Veo3</option>
-              : <>
-                  <option value="chatgpt">🤖 CHATGPT</option>
-                  <option value="nanobanana">🍌 NANOBANANA</option>
-                  <option value="grok">🧠 GROK</option>
-                </>
-            }
-          </select>
+          <textarea value={prompt} onChange={e=>setPrompt(e.target.value)} style={textareaStyle} />
 
           <button onClick={savePrompt} style={mainBtn}>
             {uploading ? "⏳ Uploading..." : "DODAJ PROMPT"}
           </button>
         </div>
 
-        {/* SORT */}
-        <select value={sort} onChange={(e)=>setSort(e.target.value)} style={inputStyle}>
-          <option value="newest">🆕 Najnowsze</option>
-          <option value="oldest">📜 Najstarsze</option>
-        </select>
-
-        {/* TABS */}
         <div style={tabsWrapper}>
-          <div onClick={()=>setFilter("all")} style={{...tab, ...(filter==="all" ? activeTab : {})}}>🌍 Wszystko</div>
-          <div onClick={()=>setFilter("image")} style={{...tab, ...(filter==="image" ? activeTab : {})}}>📸 Zdjęcia</div>
-          <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬 Video</div>
+          <div onClick={()=>setFilter("all")} style={{...tab, ...(filter==="all" ? activeTab : {})}}>🌍</div>
+          <div onClick={()=>setFilter("image")} style={{...tab, ...(filter==="image" ? activeTab : {})}}>📸</div>
+          <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬</div>
         </div>
 
-        {/* GRID */}
         <div style={{columnCount:columns, columnGap:"20px"}}>
           {[...prompts]
-            .filter(item => {
-              if (filter === "all") return true;
-              if (!item.fileType) return filter === "image"; // 🔥 fix starych danych
-              return item.fileType === filter;
-            })
-            .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
+            .filter(item => filter==="all" || !item.fileType || item.fileType===filter)
             .map(item => (
               <div key={item.id} style={cardMini}>
 
@@ -190,18 +159,11 @@ export default function Home() {
 
                   <label style={replaceBtn}>
                     🔄
-                    <input type="file" accept="image/*,video/*" onChange={(e)=>replaceImage(item.id, e.target.files[0])} style={{display:"none"}} />
+                    <input type="file" onChange={(e)=>replaceImage(item.id, e.target.files[0])} style={{display:"none"}} />
                   </label>
                 </div>
 
                 <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} showAbove />
-
-                <p style={{opacity:0.6,fontSize:"12px"}}>
-                  {item.type==="chatgpt" && "🤖 ChatGPT"}
-                  {item.type==="nanobanana" && "🍌 NanoBanana"}
-                  {item.type==="veo3" && "🎬 Veo3"}
-                  {item.type==="grok" && "🧠 Grok"}
-                </p>
 
               </div>
             ))}
@@ -215,97 +177,78 @@ export default function Home() {
 /* STYLE */
 const cardStyle = { background:"#111", padding:"20px", borderRadius:"16px", margin:"20px 0" };
 const cardMini = { breakInside:"avoid", background:"#1a1a1a", padding:"10px", borderRadius:"12px", marginBottom:"20px" };
-const inputStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white", border:"1px solid #333" };
-const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
-const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px", cursor:"pointer" };
-const previewStyle = { width:"100%", borderRadius:"10px", display:"block" };
-const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"linear-gradient(135deg,#ff0080,#7928ca)", border:"none", color:"white", cursor:"pointer", marginTop:"10px" };
+const inputStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
+const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", background:"#000", color:"white" };
+const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px" };
+const previewStyle = { width:"100%", borderRadius:"10px" };
+const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"#ff0080", color:"white" };
 
 const imageWrapper = { position:"relative" };
-
-const replaceBtn = {
-  position:"absolute",
-  bottom:"10px",
-  right:"10px",
-  background:"rgba(0,0,0,0.85)",
-  color:"white",
-  borderRadius:"12px",
-  padding:"8px 10px",
-  cursor:"pointer",
-  zIndex:9999
-};
+const replaceBtn = { position:"absolute", bottom:"10px", right:"10px", background:"#000", padding:"8px", borderRadius:"10px" };
 
 const tabsWrapper = { display:"flex", gap:"10px", margin:"15px 0" };
-
-const tab = {
-  padding:"10px 16px",
-  borderRadius:"12px",
-  background:"#111",
-  border:"1px solid #333",
-  cursor:"pointer",
-  color:"#aaa"
-};
-
-const activeTab = {
-  background:"linear-gradient(135deg,#ff0080,#7928ca)",
-  color:"white",
-  border:"none"
-};
+const tab = { padding:"10px", background:"#111", borderRadius:"10px", cursor:"pointer" };
+const activeTab = { background:"#ff0080" };
 
 const tileRow = { display:"flex", gap:"10px", marginTop:"8px" };
+const tile = { flex:1, textAlign:"center", padding:"8px", background:"#222", borderRadius:"10px", cursor:"pointer" };
 
-const tile = {
-  flex:1,
-  textAlign:"center",
-  padding:"8px",
+const overlay = {
+  position:"fixed",
+  top:0,
+  left:0,
+  width:"100%",
+  height:"100%",
+  background:"rgba(0,0,0,0.95)",
+  zIndex:99999,
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center",
+  padding:"20px"
+};
+
+const editorBox = {
+  width:"100%",
+  maxWidth:"600px",
+  background:"#111",
+  padding:"20px",
+  borderRadius:"16px"
+};
+
+const editorTextarea = {
+  width:"100%",
+  height:"300px",
+  background:"#000",
+  color:"white",
   borderRadius:"10px",
-  background:"#222",
-  cursor:"pointer"
+  padding:"10px"
 };
 
 function Editable({text="", onSave, showAbove=false}) {
   const [edit,setEdit]=useState(false);
   const [val,setVal]=useState(text);
-  const [expanded,setExpanded]=useState(false);
-  const [copied,setCopied]=useState(false);
-
-  const copy=()=>{
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(()=>setCopied(false),1200);
-  };
-
-  const tiles = (
-    <div style={tileRow}>
-      {text.length>120 && (
-        <div onClick={()=>setExpanded(!expanded)} style={tile}>
-          {expanded ? "▲" : "▼"}
-        </div>
-      )}
-      <div onClick={()=>setEdit(true)} style={tile}>✏️</div>
-      <div onClick={copy} style={{...tile, background: copied ? "#00c853" : "#222"}}>
-        {copied ? "✔" : "📋"}
-      </div>
-    </div>
-  );
-
-  if(edit){
-    return(
-      <div>
-        {tiles}
-        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}}/>
-        <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
-      </div>
-    )
-  }
 
   return(
     <div>
-      {showAbove && tiles}
-      <p>
-        {expanded ? text : text.slice(0,120)}
-        {text.length>120 && !expanded && "..."}
-      </p>
+
+      {showAbove && (
+        <div style={tileRow}>
+          <div onClick={()=>setEdit(true)} style={tile}>✏️ EDYTUJ</div>
+        </div>
+      )}
+
+      <p>{text.slice(0,120)}...</p>
+
+      {edit && (
+        <div style={overlay}>
+          <div style={editorBox}>
+            <textarea value={val} onChange={e=>setVal(e.target.value)} style={editorTextarea}/>
+            <button onClick={()=>{onSave(val);setEdit(false)}}>💾 ZAPISZ</button>
+            <button onClick={()=>setEdit(false)}>❌</button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
