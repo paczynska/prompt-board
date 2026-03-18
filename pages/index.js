@@ -23,41 +23,30 @@ export default function Home() {
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "ml_default");
-      formData.append("resource_type", "auto");
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default");
+    formData.append("resource_type", "auto");
 
-      const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/auto/upload", {
-        method: "POST",
-        body: formData
-      });
+    const res = await fetch("https://api.cloudinary.com/v1_1/ddrasgbno/auto/upload", {
+      method: "POST",
+      body: formData
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!data.secure_url) {
-        alert("Błąd uploadu!");
-        return;
-      }
+    await addDoc(collection(db, "prompts"), {
+      image: data.secure_url,
+      prompt: prompt || "",
+      type,
+      fileType: file.type.startsWith("video") ? "video" : "image",
+      createdAt: new Date()
+    });
 
-      await addDoc(collection(db, "prompts"), {
-        image: data.secure_url,
-        prompt: prompt || "",
-        type,
-        fileType: file.type.startsWith("video") ? "video" : "image",
-        createdAt: new Date()
-      });
-
-      setFile(null);
-      setPreview(null);
-      setPrompt("");
-      loadPrompts();
-
-    } catch (err) {
-      console.error(err);
-      alert("Coś poszło nie tak 😅");
-    }
+    setFile(null);
+    setPreview(null);
+    setPrompt("");
+    loadPrompts();
   };
 
   const editPrompt = async (id, newPrompt) => {
@@ -67,11 +56,7 @@ export default function Home() {
   };
 
   return (
-   <div style={{ 
-  background: "#000", 
-  minHeight: "100vh",
-  fontFamily: "inherit"
-}}>
+    <div style={{ background: "#000", minHeight: "100vh", fontFamily:"inherit" }}>
       
       <div style={{
         padding: "20px",
@@ -80,78 +65,84 @@ export default function Home() {
         color: "white"
       }}>
 
-        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 PLANETA PROMPTÓW</h1>
+        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
-        {/* FORM */}
+        {/* 🔥 NOWOCZESNY FORM */}
         <div style={{
-          background: "#1f1f1f",
-          padding: "20px",
-          borderRadius: "16px",
-          marginBottom: "30px"
+          background: "linear-gradient(145deg, #1a1a1a, #111)",
+          padding: "25px",
+          borderRadius: "20px",
+          marginBottom: "30px",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+          border: "1px solid #2a2a2a"
         }}>
 
-          <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)}>
+          <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
             <option value="image">📸 Obraz</option>
             <option value="video">🎬 Video (Veo3)</option>
           </select>
 
-          <input 
-            key={mediaType}
-            type="file" 
-            accept={mediaType === "video" ? "video/*" : "image/*"}
-            onChange={(e) => {
-              const selected = e.target.files?.[0];
-              if (!selected) return;
+          <div style={{marginTop:"12px"}}>
+            <label style={uploadBox}>
+              📁 Wybierz plik
+              <input 
+                type="file"
+                accept={mediaType === "video" ? "video/*" : "image/*"}
+                onChange={(e) => {
+                  const selected = e.target.files?.[0];
+                  if (!selected) return;
 
-              setFile(selected);
-              setPreview(URL.createObjectURL(selected));
+                  setFile(selected);
+                  setPreview(URL.createObjectURL(selected));
 
-              if (selected.type.startsWith("video")) {
-                setMediaType("video");
-                setType("veo3");
-              } else {
-                setMediaType("image");
-              }
-            }}
-          />
+                  if (selected.type.startsWith("video")) {
+                    setMediaType("video");
+                    setType("veo3");
+                  } else {
+                    setMediaType("image");
+                  }
+                }}
+                style={{display:"none"}}
+              />
+            </label>
+          </div>
 
           {preview && (
-            <div style={{marginTop:"10px"}}>
+            <div style={{marginTop:"15px"}}>
               {mediaType === "video" ? (
-                <video src={preview} controls style={{width:"100%", maxHeight:"300px"}} />
+                <video src={preview} controls style={previewStyle} />
               ) : (
-                <img src={preview} style={{width:"100%", maxHeight:"300px", objectFit:"cover"}} />
+                <img src={preview} style={previewStyle} />
               )}
             </div>
           )}
 
           <textarea 
-            placeholder="Wpisz prompt..." 
+            placeholder="✨ Wpisz prompt..." 
             value={prompt} 
             onChange={e=>setPrompt(e.target.value)}
-            style={{width:"100%", marginTop:"10px"}}
+            style={textareaStyle}
           />
 
           <select 
             value={type} 
             onChange={e=>setType(e.target.value)}
             disabled={mediaType === "video"}
+            style={inputStyle}
           >
             <option value="chatgpt">🤖 ChatGPT</option>
             <option value="nanobanana">🍌 NanoBanana</option>
             <option value="veo3">🎬 Veo3</option>
           </select>
 
-          <br/><br/>
+          <button onClick={savePrompt} style={buttonStyle}>
+            🚀 Dodaj prompt
+          </button>
 
-          <button onClick={savePrompt}>💾 Zapisz</button>
         </div>
 
         {/* GRID */}
-        <div style={{
-          columnCount: 3,
-          columnGap: "20px"
-        }}>
+        <div style={{ columnCount: 3, columnGap: "20px" }}>
           {prompts.map((item) => (
             <div key={item.id} style={{
               breakInside:"avoid",
@@ -183,15 +174,66 @@ export default function Home() {
   );
 }
 
-/* 🔥 NOWOCZESNE BUTTONY */
+/* 🔥 STYLE */
+const inputStyle = {
+  width: "100%",
+  padding: "12px",
+  borderRadius: "12px",
+  border: "1px solid #333",
+  background: "#111",
+  color: "white",
+  marginTop: "10px"
+};
+
+const textareaStyle = {
+  width: "100%",
+  padding: "14px",
+  borderRadius: "14px",
+  border: "1px solid #333",
+  background: "#111",
+  color: "white",
+  marginTop: "15px",
+  minHeight: "100px"
+};
+
+const buttonStyle = {
+  width: "100%",
+  marginTop: "15px",
+  padding: "14px",
+  borderRadius: "14px",
+  border: "none",
+  background: "linear-gradient(135deg,#ff0080,#7928ca)",
+  color: "white",
+  fontWeight: "bold",
+  cursor: "pointer",
+  fontSize: "16px"
+};
+
+const uploadBox = {
+  display: "block",
+  padding: "14px",
+  borderRadius: "12px",
+  border: "1px dashed #444",
+  textAlign: "center",
+  cursor: "pointer",
+  background: "#111",
+  color: "#aaa"
+};
+
+const previewStyle = {
+  width: "100%",
+  borderRadius: "12px",
+  maxHeight: "300px",
+  objectFit: "cover"
+};
+
 const btnStyle = {
   background: "#222",
   border: "1px solid #333",
   color: "white",
   padding: "6px 12px",
   borderRadius: "10px",
-  cursor: "pointer",
-  transition: "0.2s",
+  cursor: "pointer"
 };
 
 function Editable({text = "", onSave}) {
@@ -211,11 +253,7 @@ function Editable({text = "", onSave}) {
   if (edit) {
     return (
       <div>
-        <textarea 
-          value={val} 
-          onChange={e=>setVal(e.target.value)}
-          style={{width:"100%", minHeight:"80px"}}
-        />
+        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}} />
         <button onClick={()=>{onSave(val); setEdit(false)}}>💾</button>
       </div>
     );
@@ -232,27 +270,15 @@ function Editable({text = "", onSave}) {
       </p>
 
       <div style={{display:"flex", gap:"10px", marginTop:"8px"}}>
-
         {isLong && (
           <button onClick={()=>setExpanded(!expanded)} style={btnStyle}>
             {expanded ? "▲ Zwiń" : "▼ Czytaj więcej"}
           </button>
         )}
-
-        <button onClick={()=>setEdit(true)} style={btnStyle}>
-          ✏️ Edytuj
-        </button>
-
-        <button 
-          onClick={handleCopy}
-          style={{
-            ...btnStyle,
-            background: copied ? "#00c853" : "#222"
-          }}
-        >
+        <button onClick={()=>setEdit(true)} style={btnStyle}>✏️ Edytuj</button>
+        <button onClick={handleCopy} style={{...btnStyle, background: copied ? "#00c853" : "#222"}}>
           {copied ? "✔ Skopiowano" : "📋 Kopiuj"}
         </button>
-
       </div>
     </div>
   );
