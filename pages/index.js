@@ -129,12 +129,19 @@ export default function Home() {
   onChange={e=>setType(e.target.value)}
   style={inputStyle}
 >
-  <option value="chatgpt">🤖 ChatGPT</option>
-  <option value="nanobanana">🍌 NanoBanana</option>
-  <option value="grok">🧠 Grok</option>
-
-  {mediaType === "video" && (
+  <select 
+  value={type} 
+  onChange={e=>setType(e.target.value)}
+  style={inputStyle}
+>
+  {mediaType === "video" ? (
     <option value="veo3">🎬 Veo3</option>
+  ) : (
+    <>
+      <option value="chatgpt">🤖 ChatGPT</option>
+      <option value="nanobanana">🍌 NanoBanana</option>
+      <option value="grok">🧠 Grok</option>
+    </>
   )}
 </select>
 
