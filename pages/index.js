@@ -71,6 +71,7 @@ export default function Home() {
 
         <h1 style={{fontSize:"32px"}}>🔥 PLANETA PROMPTÓW</h1>
 
+        {/* FORM */}
         <div style={cardStyle}>
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
             <option value="image">📸 OBRAZ</option>
@@ -123,23 +124,27 @@ export default function Home() {
           </button>
         </div>
 
+        {/* SORT */}
         <select value={sort} onChange={(e)=>setSort(e.target.value)} style={inputStyle}>
           <option value="newest">🆕 Najnowsze</option>
           <option value="oldest">📜 Najstarsze</option>
         </select>
 
+        {/* GRID */}
         <div style={{columnCount:3, columnGap:"20px"}}>
           {[...prompts]
             .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
             .map(item => (
               <div key={item.id} style={cardMini}>
 
+                {/* OBRAZ */}
                 {item.fileType==="video"
                   ? <video src={item.image} controls style={previewStyle}/>
                   : <img src={item.image} style={previewStyle}/>
                 }
 
-                <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)}/>
+                {/* 🔥 KAFELKI */}
+                <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} showAbove />
 
                 <p style={{opacity:0.6,fontSize:"12px"}}>
                   {item.type==="chatgpt" && "🤖 ChatGPT"}
@@ -166,7 +171,7 @@ const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", b
 const previewStyle = { width:"100%", borderRadius:"10px", marginTop:"10px" };
 const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"linear-gradient(135deg,#ff0080,#7928ca)", border:"none", color:"white", cursor:"pointer", marginTop:"10px" };
 
-const tileRow = { display:"flex", gap:"10px", marginTop:"10px" };
+const tileRow = { display:"flex", gap:"10px", marginTop:"8px" };
 
 const tile = {
   flex:1,
@@ -177,17 +182,17 @@ const tile = {
   cursor:"pointer",
   fontSize:"13px",
   border:"1px solid #333",
-  transition:"transform 0.1s, background 0.2s"
+  transition:"transform 0.1s"
 };
 
-function Editable({text="", onSave}) {
+function Editable({text="", onSave, showAbove=false}) {
   const [edit,setEdit]=useState(false);
   const [val,setVal]=useState(text);
   const [expanded,setExpanded]=useState(false);
   const [copied,setCopied]=useState(false);
 
   const clickAnim = (e)=>{
-    e.currentTarget.style.transform = "scale(0.92)";
+    e.currentTarget.style.transform = "scale(0.9)";
     setTimeout(()=> e.currentTarget.style.transform="scale(1)", 100);
   };
 
@@ -197,10 +202,27 @@ function Editable({text="", onSave}) {
     setTimeout(()=>setCopied(false),1200);
   };
 
+  const tiles = (
+    <div style={tileRow}>
+      {text.length>120 && (
+        <div onClick={(e)=>{clickAnim(e); setExpanded(!expanded)}} style={tile}>
+          {expanded ? "▲" : "▼"}
+        </div>
+      )}
+      <div onClick={(e)=>{clickAnim(e); setEdit(true)}} style={tile}>
+        ✏️
+      </div>
+      <div onClick={(e)=>{clickAnim(e); copy()}} style={{...tile, background: copied ? "#00c853" : "#222"}}>
+        {copied ? "✔" : "📋"}
+      </div>
+    </div>
+  );
+
   if(edit){
     return(
       <div>
-        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}}/>
+        {tiles}
+        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%", marginTop:"10px"}}/>
         <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
       </div>
     )
@@ -208,37 +230,12 @@ function Editable({text="", onSave}) {
 
   return(
     <div>
+      {showAbove && tiles}
+
       <p style={{marginTop:"10px"}}>
         {expanded ? text : text.slice(0,120)}
         {text.length>120 && !expanded && "..."}
       </p>
-
-      <div style={tileRow}>
-
-        {text.length>120 && (
-          <div 
-            onClick={(e)=>{clickAnim(e); setExpanded(!expanded)}} 
-            style={tile}
-          >
-            {expanded?"▲":"▼"}
-          </div>
-        )}
-
-        <div 
-          onClick={(e)=>{clickAnim(e); setEdit(true)}} 
-          style={tile}
-        >
-          ✏️
-        </div>
-
-        <div 
-          onClick={(e)=>{clickAnim(e); copy()}} 
-          style={{...tile, background: copied ? "#00c853" : "#222"}}
-        >
-          {copied ? "✔" : "📋"}
-        </div>
-
-      </div>
     </div>
   );
 }
