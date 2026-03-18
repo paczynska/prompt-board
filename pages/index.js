@@ -11,6 +11,7 @@ export default function Home() {
   const [preview, setPreview] = useState(null);
   const [sort, setSort] = useState("newest");
   const [uploading, setUploading] = useState(false);
+  const [filter, setFilter] = useState("all");
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
@@ -152,9 +153,17 @@ export default function Home() {
           <option value="oldest">📜 Najstarsze</option>
         </select>
 
+        {/* 🔥 TABS */}
+        <div style={tabsWrapper}>
+          <div onClick={()=>setFilter("all")} style={{...tab, ...(filter==="all" ? activeTab : {})}}>🌍 Wszystko</div>
+          <div onClick={()=>setFilter("image")} style={{...tab, ...(filter==="image" ? activeTab : {})}}>📸 Zdjęcia</div>
+          <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬 Video</div>
+        </div>
+
         {/* GRID */}
         <div style={{columnCount:3, columnGap:"20px"}}>
           {[...prompts]
+            .filter(item => filter==="all" || item.fileType===filter)
             .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
             .map(item => (
               <div key={item.id} style={cardMini}>
@@ -167,12 +176,7 @@ export default function Home() {
 
                   <label style={replaceBtn}>
                     🔄
-                    <input 
-                      type="file"
-                      accept="image/*,video/*"
-                      onChange={(e)=>replaceImage(item.id, e.target.files[0])}
-                      style={{display:"none"}}
-                    />
+                    <input type="file" accept="image/*,video/*" onChange={(e)=>replaceImage(item.id, e.target.files[0])} style={{display:"none"}} />
                   </label>
                 </div>
 
@@ -215,6 +219,23 @@ const replaceBtn = {
   padding:"8px 10px",
   cursor:"pointer",
   zIndex:9999
+};
+
+const tabsWrapper = { display:"flex", gap:"10px", margin:"15px 0" };
+
+const tab = {
+  padding:"10px 16px",
+  borderRadius:"12px",
+  background:"#111",
+  border:"1px solid #333",
+  cursor:"pointer",
+  color:"#aaa"
+};
+
+const activeTab = {
+  background:"linear-gradient(135deg,#ff0080,#7928ca)",
+  color:"white",
+  border:"none"
 };
 
 const tileRow = { display:"flex", gap:"10px", marginTop:"8px" };
