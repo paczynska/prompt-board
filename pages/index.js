@@ -101,7 +101,7 @@ export default function Home() {
           <textarea 
             value={prompt}
             onChange={e=>setPrompt(e.target.value)}
-            placeholder="✨ Wpisz prompt..."
+            placeholder="✨ "
             style={textareaStyle}
           />
 
@@ -119,7 +119,7 @@ export default function Home() {
           </select>
 
           <button onClick={savePrompt} style={mainBtn}>
-            🚀 Dodaj prompt
+            🚀 DODAJ PROMPT
           </button>
 
         </div>
