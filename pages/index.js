@@ -29,7 +29,7 @@ export default function Home() {
   // 🔥 TŁUMACZ
   const translateText = async (text, targetLang) => {
     try {
-      const res = await fetch("https://libretranslate.de/translate", {
+      const res = await fetch("https://translate.argosopentech.com/translate", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({
