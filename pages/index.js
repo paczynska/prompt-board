@@ -20,28 +20,33 @@ export default function Home() {
     loadPrompts();
   }, []);
 
-  // AUTO AI
+  // 🔥 AUTO AI
   useEffect(() => {
     if (mediaType === "video") setType("veo3");
     else setType("chatgpt");
   }, [mediaType]);
 
-  // 🔥 TŁUMACZ
+  // 🔥 CHATGPT TŁUMACZ (API)
   const translateText = async (text, targetLang) => {
     try {
-      const res = await fetch("https://translate.argosopentech.com/translate", {
+      const res = await fetch("/api/translate", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          q: text,
-          source: "auto",
-          target: targetLang,
-          format: "text"
+          text,
+          target: targetLang
         })
       });
+
       const data = await res.json();
-      return data.translatedText;
-    } catch {
+
+      if (!data.text) throw new Error();
+
+      return data.text;
+
+    } catch (err) {
       alert("Błąd tłumaczenia 😅");
       return text;
     }
