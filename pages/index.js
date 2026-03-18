@@ -163,7 +163,13 @@ export default function Home() {
         {/* GRID */}
         <div style={{columnCount:3, columnGap:"20px"}}>
           {[...prompts]
-            .filter(item => filter==="all" || item.fileType===filter)
+           .filter(item => {
+  if (filter === "all") return true;
+
+  if (!item.fileType) return filter === "image"; // 🔥 stare = image
+
+  return item.fileType === filter;
+})
             .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
             .map(item => (
               <div key={item.id} style={cardMini}>
