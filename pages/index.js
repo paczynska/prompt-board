@@ -27,11 +27,7 @@ export default function Home() {
     else setType("chatgpt");
   }, [mediaType]);
 
-  const savePrompt = async () => {
-    if (!file) return alert("Dodaj plik!");
-
-    setUploading(true);
-
+  const uploadFile = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "ml_default");
@@ -43,9 +39,18 @@ export default function Home() {
     });
 
     const data = await res.json();
+    return data.secure_url;
+  };
+
+  const savePrompt = async () => {
+    if (!file) return alert("Dodaj plik!");
+
+    setUploading(true);
+
+    const url = await uploadFile(file);
 
     await addDoc(collection(db, "prompts"), {
-      image: data.secure_url,
+      image: url,
       prompt: prompt || "",
       type,
       fileType: file.type.startsWith("video") ? "video" : "image",
@@ -56,6 +61,24 @@ export default function Home() {
     setFile(null);
     setPreview(null);
     setPrompt("");
+    loadPrompts();
+  };
+
+  // 🔥 PODMIANA OBRAZU
+  const replaceImage = async (id, newFile) => {
+    if (!newFile) return;
+
+    setUploading(true);
+
+    const url = await uploadFile(newFile);
+    const ref = doc(db, "prompts", id);
+
+    await updateDoc(ref, {
+      image: url,
+      fileType: newFile.type.startsWith("video") ? "video" : "image"
+    });
+
+    setUploading(false);
     loadPrompts();
   };
 
@@ -137,13 +160,25 @@ export default function Home() {
             .map(item => (
               <div key={item.id} style={cardMini}>
 
-                {/* OBRAZ */}
-                {item.fileType==="video"
-                  ? <video src={item.image} controls style={previewStyle}/>
-                  : <img src={item.image} style={previewStyle}/>
-                }
+                {/* OBRAZ + 🔄 */}
+                <div style={imageWrapper}>
+                  {item.fileType==="video"
+                    ? <video src={item.image} controls style={previewStyle}/>
+                    : <img src={item.image} style={previewStyle}/>
+                  }
 
-                {/* 🔥 KAFELKI */}
+                  <label style={replaceBtn}>
+                    🔄
+                    <input 
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={(e)=>replaceImage(item.id, e.target.files[0])}
+                      style={{display:"none"}}
+                    />
+                  </label>
+                </div>
+
+                {/* KAFELKI + PROMPT */}
                 <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} showAbove />
 
                 <p style={{opacity:0.6,fontSize:"12px"}}>
@@ -170,6 +205,19 @@ const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", margi
 const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px", cursor:"pointer" };
 const previewStyle = { width:"100%", borderRadius:"10px", marginTop:"10px" };
 const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"linear-gradient(135deg,#ff0080,#7928ca)", border:"none", color:"white", cursor:"pointer", marginTop:"10px" };
+
+const imageWrapper = { position:"relative" };
+
+const replaceBtn = {
+  position:"absolute",
+  top:"10px",
+  left:"10px",
+  background:"rgba(0,0,0,0.6)",
+  backdropFilter:"blur(6px)",
+  borderRadius:"10px",
+  padding:"6px 10px",
+  cursor:"pointer"
+};
 
 const tileRow = { display:"flex", gap:"10px", marginTop:"8px" };
 
@@ -209,9 +257,7 @@ function Editable({text="", onSave, showAbove=false}) {
           {expanded ? "▲" : "▼"}
         </div>
       )}
-      <div onClick={(e)=>{clickAnim(e); setEdit(true)}} style={tile}>
-        ✏️
-      </div>
+      <div onClick={(e)=>{clickAnim(e); setEdit(true)}} style={tile}>✏️</div>
       <div onClick={(e)=>{clickAnim(e); copy()}} style={{...tile, background: copied ? "#00c853" : "#222"}}>
         {copied ? "✔" : "📋"}
       </div>
@@ -231,7 +277,6 @@ function Editable({text="", onSave, showAbove=false}) {
   return(
     <div>
       {showAbove && tiles}
-
       <p style={{marginTop:"10px"}}>
         {expanded ? text : text.slice(0,120)}
         {text.length>120 && !expanded && "..."}
