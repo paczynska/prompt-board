@@ -135,9 +135,9 @@ export default function Home() {
               <option value="veo3">🎬 Veo3</option>
             ) : (
               <>
-                <option value="chatgpt">🤖 ChatGPT</option>
-                <option value="nanobanana">🍌 NanoBanana</option>
-                <option value="grok">🧠 Grok</option>
+                <option value="chatgpt">🤖 CHATGPT</option>
+                <option value="nanobanana">🍌 NANOBANANA</option>
+                <option value="grok">🧠 GROK</option>
               </>
             )}
           </select>
