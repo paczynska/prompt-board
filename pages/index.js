@@ -143,7 +143,7 @@ export default function Home() {
           </select>
 
           <button onClick={savePrompt} style={mainBtn}>
-            {uploading ? "⏳ Uploading..." : "🚀 DODAJ PROMPT"}
+            {uploading ? "⏳ Uploading..." : "DODAJ PROMPT"}
           </button>
         </div>
 
