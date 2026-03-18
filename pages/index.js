@@ -212,11 +212,15 @@ const replaceBtn = {
   position:"absolute",
   top:"10px",
   left:"10px",
-  background:"rgba(0,0,0,0.6)",
-  backdropFilter:"blur(6px)",
-  borderRadius:"10px",
-  padding:"6px 10px",
-  cursor:"pointer"
+  background:"rgba(0,0,0,0.85)",
+  color:"white",
+  borderRadius:"12px",
+  padding:"8px 10px",
+  cursor:"pointer",
+  zIndex: 9999,              // 🔥 KLUCZOWE
+  fontSize:"16px",
+  border:"1px solid rgba(255,255,255,0.1)",
+  boxShadow:"0 4px 12px rgba(0,0,0,0.5)"
 };
 
 const tileRow = { display:"flex", gap:"10px", marginTop:"8px" };
