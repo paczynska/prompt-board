@@ -162,8 +162,9 @@ export default function Home() {
 
               <p style={{fontSize:"12px", opacity:0.6}}>
                 {item.type === "chatgpt" && "🤖 ChatGPT"}
-                {item.type === "nanobanana" && "🍌 NanoBanana"}
-                {item.type === "veo3" && "🎬 Veo3"}
+{item.type === "nanobanana" && "🍌 NanoBanana"}
+{item.type === "veo3" && "🎬 Veo3"}
+{item.type === "grok" && "🧠 Grok"}
               </p>
             </div>
           ))}
