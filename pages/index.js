@@ -12,6 +12,7 @@ export default function Home() {
   const [sort, setSort] = useState("newest");
   const [uploading, setUploading] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [columns, setColumns] = useState(3);
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
@@ -27,6 +28,18 @@ export default function Home() {
     if (mediaType === "video") setType("veo3");
     else setType("chatgpt");
   }, [mediaType]);
+
+  // 🔥 RESPONSIVE GRID
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth < 600) setColumns(1);
+      else if (window.innerWidth < 1000) setColumns(2);
+      else setColumns(3);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -45,7 +58,6 @@ export default function Home() {
 
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
-
     setUploading(true);
 
     const url = await uploadFile(file);
@@ -67,7 +79,6 @@ export default function Home() {
 
   const replaceImage = async (id, newFile) => {
     if (!newFile) return;
-
     setUploading(true);
 
     const url = await uploadFile(newFile);
@@ -131,15 +142,14 @@ export default function Home() {
           />
 
           <select value={type} onChange={e=>setType(e.target.value)} style={inputStyle}>
-            {mediaType === "video" ? (
-              <option value="veo3">🎬 Veo3</option>
-            ) : (
-              <>
-                <option value="chatgpt">🤖 CHATGPT</option>
-                <option value="nanobanana">🍌 NANOBANANA</option>
-                <option value="grok">🧠 GROK</option>
-              </>
-            )}
+            {mediaType === "video"
+              ? <option value="veo3">🎬 Veo3</option>
+              : <>
+                  <option value="chatgpt">🤖 CHATGPT</option>
+                  <option value="nanobanana">🍌 NANOBANANA</option>
+                  <option value="grok">🧠 GROK</option>
+                </>
+            }
           </select>
 
           <button onClick={savePrompt} style={mainBtn}>
@@ -153,7 +163,7 @@ export default function Home() {
           <option value="oldest">📜 Najstarsze</option>
         </select>
 
-        {/* 🔥 TABS */}
+        {/* TABS */}
         <div style={tabsWrapper}>
           <div onClick={()=>setFilter("all")} style={{...tab, ...(filter==="all" ? activeTab : {})}}>🌍 Wszystko</div>
           <div onClick={()=>setFilter("image")} style={{...tab, ...(filter==="image" ? activeTab : {})}}>📸 Zdjęcia</div>
@@ -161,15 +171,13 @@ export default function Home() {
         </div>
 
         {/* GRID */}
-        <div style={{columnCount:3, columnGap:"20px"}}>
+        <div style={{columnCount:columns, columnGap:"20px"}}>
           {[...prompts]
-           .filter(item => {
-  if (filter === "all") return true;
-
-  if (!item.fileType) return filter === "image"; // 🔥 stare = image
-
-  return item.fileType === filter;
-})
+            .filter(item => {
+              if (filter === "all") return true;
+              if (!item.fileType) return filter === "image"; // 🔥 fix starych danych
+              return item.fileType === filter;
+            })
             .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
             .map(item => (
               <div key={item.id} style={cardMini}>
