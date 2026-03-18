@@ -20,14 +20,32 @@ export default function Home() {
     loadPrompts();
   }, []);
 
-  // 🔥 AUTO AI
+  // AUTO AI
   useEffect(() => {
-    if (mediaType === "video") {
-      setType("veo3");
-    } else {
-      setType("chatgpt");
-    }
+    if (mediaType === "video") setType("veo3");
+    else setType("chatgpt");
   }, [mediaType]);
+
+  // 🔥 TŁUMACZ
+  const translateText = async (text, targetLang) => {
+    try {
+      const res = await fetch("https://libretranslate.de/translate", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          q: text,
+          source: "auto",
+          target: targetLang,
+          format: "text"
+        })
+      });
+      const data = await res.json();
+      return data.translatedText;
+    } catch {
+      alert("Błąd tłumaczenia 😅");
+      return text;
+    }
+  };
 
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
@@ -65,74 +83,60 @@ export default function Home() {
   };
 
   return (
-    <div style={{ background: "#000", minHeight: "100vh", fontFamily:"inherit" }}>
+    <div style={{ background: "#000", minHeight: "100vh", color:"white" }}>
       
-      <div style={{
-        padding: "20px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        color: "white"
-      }}>
+      <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
 
-        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 PLANETA PROMPTÓW</h1>
+        <h1 style={{fontSize:"32px"}}>🔥 PLANETA PROMPTÓW</h1>
 
         {/* FORM */}
-        <div style={{
-          background: "linear-gradient(145deg, #1a1a1a, #111)",
-          padding: "25px",
-          borderRadius: "20px",
-          marginBottom: "30px",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
-          border: "1px solid #2a2a2a"
-        }}>
+        <div style={cardStyle}>
 
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
             <option value="image">📸 OBRAZ</option>
             <option value="video">🎬 VIDEO</option>
           </select>
 
-          <div style={{marginTop:"12px"}}>
-            <label style={uploadBox}>
-              📁 Wybierz plik
-              <input 
-                type="file"
-                accept={mediaType === "video" ? "video/*" : "image/*"}
-                onChange={(e) => {
-                  const selected = e.target.files?.[0];
-                  if (!selected) return;
-
-                  setFile(selected);
-                  setPreview(URL.createObjectURL(selected));
-
-                  if (selected.type.startsWith("video")) {
-                    setMediaType("video");
-                  } else {
-                    setMediaType("image");
-                  }
-                }}
-                style={{display:"none"}}
-              />
-            </label>
-          </div>
+          <label style={uploadBox}>
+            📁 Wybierz plik
+            <input 
+              type="file"
+              accept={mediaType === "video" ? "video/*" : "image/*"}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                setFile(f);
+                setPreview(URL.createObjectURL(f));
+                setMediaType(f.type.startsWith("video") ? "video" : "image");
+              }}
+              style={{display:"none"}}
+            />
+          </label>
 
           {preview && (
-            <div style={{marginTop:"15px"}}>
-              {mediaType === "video" ? (
-                <video src={preview} controls style={previewStyle} />
-              ) : (
-                <img src={preview} style={previewStyle} />
-              )}
-            </div>
+            mediaType === "video"
+              ? <video src={preview} controls style={previewStyle}/>
+              : <img src={preview} style={previewStyle}/>
           )}
 
           <textarea 
-            placeholder="✨ Wpisz prompt..." 
-            value={prompt} 
+            value={prompt}
             onChange={e=>setPrompt(e.target.value)}
+            placeholder="✨ Wpisz prompt..."
             style={textareaStyle}
           />
 
-          {/* 🔥 SELECT AI */}
+          {/* 🔥 TŁUMACZ */}
+          <div style={{display:"flex", gap:"10px"}}>
+            <button onClick={async()=>setPrompt(await translateText(prompt,"en"))} style={btnStyle}>
+              🇵🇱→🇬🇧
+            </button>
+            <button onClick={async()=>setPrompt(await translateText(prompt,"pl"))} style={btnStyle}>
+              🇬🇧→🇵🇱
+            </button>
+          </div>
+
+          {/* SELECT AI */}
           <select value={type} onChange={e=>setType(e.target.value)} style={inputStyle}>
             {mediaType === "video" ? (
               <option value="veo3">🎬 Veo3</option>
@@ -145,37 +149,31 @@ export default function Home() {
             )}
           </select>
 
-          <button onClick={savePrompt} style={buttonStyle}>
+          <button onClick={savePrompt} style={mainBtn}>
             🚀 Dodaj prompt
           </button>
 
         </div>
 
         {/* GRID */}
-        <div style={{ columnCount: 3, columnGap: "20px" }}>
-          {prompts.map((item) => (
-            <div key={item.id} style={{
-              breakInside:"avoid",
-              marginBottom:"20px",
-              background:"#1a1a1a",
-              borderRadius:"12px",
-              padding:"10px"
-            }}>
-              
-              {item.fileType === "video" ? (
-                <video src={item.image} controls style={{width:"100%", maxHeight:"300px"}} />
-              ) : (
-                <img src={item.image} style={{width:"100%", maxHeight:"300px", objectFit:"cover"}} />
-              )}
+        <div style={{columnCount:3, columnGap:"20px"}}>
+          {prompts.map(item => (
+            <div key={item.id} style={cardMini}>
 
-              <Editable text={item.prompt || ""} onSave={(t)=>editPrompt(item.id, t)} />
+              {item.fileType==="video"
+                ? <video src={item.image} controls style={previewStyle}/>
+                : <img src={item.image} style={previewStyle}/>
+              }
 
-              <p style={{fontSize:"12px", opacity:0.6}}>
-                {item.type === "chatgpt" && "🤖 ChatGPT"}
-                {item.type === "nanobanana" && "🍌 NanoBanana"}
-                {item.type === "veo3" && "🎬 Veo3"}
-                {item.type === "grok" && "🧠 Grok"}
+              <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)}/>
+
+              <p style={{opacity:0.6,fontSize:"12px"}}>
+                {item.type==="chatgpt" && "🤖 ChatGPT"}
+                {item.type==="nanobanana" && "🍌 NanoBanana"}
+                {item.type==="veo3" && "🎬 Veo3"}
+                {item.type==="grok" && "🧠 Grok"}
               </p>
+
             </div>
           ))}
         </div>
@@ -186,108 +184,111 @@ export default function Home() {
 }
 
 /* STYLE */
+const cardStyle = {
+  background:"#111",
+  padding:"20px",
+  borderRadius:"16px",
+  margin:"20px 0"
+};
+
+const cardMini = {
+  breakInside:"avoid",
+  background:"#1a1a1a",
+  padding:"10px",
+  borderRadius:"12px",
+  marginBottom:"20px"
+};
+
 const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  borderRadius: "12px",
-  border: "1px solid #333",
-  background: "#111",
-  color: "white",
-  marginTop: "10px"
+  width:"100%",
+  padding:"10px",
+  borderRadius:"10px",
+  margin:"10px 0",
+  background:"#000",
+  color:"white",
+  border:"1px solid #333"
 };
 
 const textareaStyle = {
-  width: "100%",
-  padding: "14px",
-  borderRadius: "14px",
-  border: "1px solid #333",
-  background: "#111",
-  color: "white",
-  marginTop: "15px",
-  minHeight: "100px"
-};
-
-const buttonStyle = {
-  width: "100%",
-  marginTop: "15px",
-  padding: "14px",
-  borderRadius: "14px",
-  border: "none",
-  background: "linear-gradient(135deg,#ff0080,#7928ca)",
-  color: "white",
-  fontWeight: "bold",
-  cursor: "pointer"
+  width:"100%",
+  padding:"10px",
+  borderRadius:"10px",
+  margin:"10px 0",
+  background:"#000",
+  color:"white"
 };
 
 const uploadBox = {
-  display: "block",
-  padding: "14px",
-  borderRadius: "12px",
-  border: "1px dashed #444",
-  textAlign: "center",
-  cursor: "pointer",
-  background: "#111",
-  color: "#aaa"
+  display:"block",
+  padding:"10px",
+  border:"1px dashed #444",
+  borderRadius:"10px",
+  cursor:"pointer"
 };
 
 const previewStyle = {
-  width: "100%",
-  borderRadius: "12px",
-  maxHeight: "300px",
-  objectFit: "cover"
+  width:"100%",
+  borderRadius:"10px",
+  marginTop:"10px"
+};
+
+const mainBtn = {
+  width:"100%",
+  padding:"12px",
+  borderRadius:"12px",
+  background:"linear-gradient(135deg,#ff0080,#7928ca)",
+  border:"none",
+  color:"white",
+  cursor:"pointer",
+  marginTop:"10px"
 };
 
 const btnStyle = {
-  background: "#222",
-  border: "1px solid #333",
-  color: "white",
-  padding: "6px 12px",
-  borderRadius: "10px",
-  cursor: "pointer"
+  background:"#222",
+  color:"white",
+  border:"none",
+  padding:"6px 10px",
+  borderRadius:"8px",
+  cursor:"pointer"
 };
 
-function Editable({text = "", onSave}) {
-  const [edit, setEdit] = useState(false);
-  const [val, setVal] = useState(text);
-  const [expanded, setExpanded] = useState(false);
-  const [copied, setCopied] = useState(false);
+function Editable({text="", onSave}) {
+  const [edit,setEdit]=useState(false);
+  const [val,setVal]=useState(text);
+  const [expanded,setExpanded]=useState(false);
+  const [copied,setCopied]=useState(false);
 
-  const isLong = text.length > 120;
-
-  const handleCopy = () => {
+  const copy=()=>{
     navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(()=>setCopied(false),1500);
   };
 
-  if (edit) {
-    return (
+  if(edit){
+    return(
       <div>
-        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}} />
-        <button onClick={()=>{onSave(val); setEdit(false)}}>💾</button>
+        <textarea value={val} onChange={e=>setVal(e.target.value)}/>
+        <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
       </div>
-    );
+    )
   }
 
-  return (
+  return(
     <div>
-      <p style={{
-        whiteSpace: "pre-wrap",
-        wordBreak: "break-word",
-        lineHeight: "1.6"
-      }}>
-        {expanded || !isLong ? text : text.substring(0,120) + "..."}
+      <p>
+        {expanded ? text : text.slice(0,120)}
+        {text.length>120 && !expanded && "..."}
       </p>
 
-      <div style={{display:"flex", gap:"10px", marginTop:"8px"}}>
-        {isLong && (
+      <div style={{display:"flex",gap:"10px"}}>
+        {text.length>120 && (
           <button onClick={()=>setExpanded(!expanded)} style={btnStyle}>
-            {expanded ? "▲ Zwiń" : "▼ Czytaj więcej"}
+            {expanded?"▲":"▼"}
           </button>
         )}
-        <button onClick={()=>setEdit(true)} style={btnStyle}>✏️ Edytuj</button>
-        <button onClick={handleCopy} style={{...btnStyle, background: copied ? "#00c853" : "#222"}}>
-          {copied ? "✔ Skopiowano" : "📋 Kopiuj"}
+        <button onClick={()=>setEdit(true)} style={btnStyle}>✏️</button>
+        <button onClick={copy} style={btnStyle}>
+          {copied?"✔":"📋"}
         </button>
       </div>
     </div>
