@@ -11,6 +11,9 @@ export default function Home() {
   const [preview, setPreview] = useState(null);
   const [sort, setSort] = useState("newest");
 
+  // 🔥 NOWE
+  const [uploading, setUploading] = useState(false);
+
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -21,14 +24,16 @@ export default function Home() {
     loadPrompts();
   }, []);
 
-  // AUTO AI
   useEffect(() => {
     if (mediaType === "video") setType("veo3");
     else setType("chatgpt");
   }, [mediaType]);
 
+  // 🔥 POPRAWIONY SAVE (ANIMACJA)
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
+
+    setUploading(true);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -50,6 +55,7 @@ export default function Home() {
       createdAt: Date.now()
     });
 
+    setUploading(false);
     setFile(null);
     setPreview(null);
     setPrompt("");
@@ -106,7 +112,6 @@ export default function Home() {
             style={textareaStyle}
           />
 
-          {/* SELECT AI */}
           <select value={type} onChange={e=>setType(e.target.value)} style={inputStyle}>
             {mediaType === "video" ? (
               <option value="veo3">🎬 Veo3</option>
@@ -119,18 +124,15 @@ export default function Home() {
             )}
           </select>
 
+          {/* 🔥 ANIMACJA */}
           <button onClick={savePrompt} style={mainBtn}>
-            🚀 Dodaj prompt
+            {uploading ? "⏳ Uploading..." : "🚀 Dodaj prompt"}
           </button>
 
         </div>
 
-        {/* 🔥 SORTOWANIE */}
-        <select 
-          value={sort} 
-          onChange={(e)=>setSort(e.target.value)}
-          style={inputStyle}
-        >
+        {/* SORT */}
+        <select value={sort} onChange={(e)=>setSort(e.target.value)} style={inputStyle}>
           <option value="newest">🆕 Najnowsze</option>
           <option value="oldest">📜 Najstarsze</option>
         </select>
@@ -138,10 +140,7 @@ export default function Home() {
         {/* GRID */}
         <div style={{columnCount:3, columnGap:"20px"}}>
           {[...prompts]
-            .sort((a, b) => {
-              if (sort === "newest") return b.createdAt - a.createdAt;
-              return a.createdAt - b.createdAt;
-            })
+            .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
             .map(item => (
               <div key={item.id} style={cardMini}>
 
