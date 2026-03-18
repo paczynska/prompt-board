@@ -129,9 +129,10 @@ export default function Home() {
   onChange={e=>setType(e.target.value)}
   style={inputStyle}
 >
-            <option value="chatgpt">🤖 CHATGPT</option>
-            <option value="nanobanana">🍌 NANOBANANA</option>
-            <option value="veo3">🎬 VEO3</option>
+           <option value="chatgpt">🤖 ChatGPT</option>
+<option value="nanobanana">🍌 NanoBanana</option>
+<option value="veo3">🎬 Veo3</option>
+<option value="grok">🧠 Grok</option>
           </select>
 
           <button onClick={savePrompt} style={buttonStyle}>
