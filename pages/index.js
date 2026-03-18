@@ -20,6 +20,15 @@ export default function Home() {
     loadPrompts();
   }, []);
 
+  // 🔥 AUTO AI
+  useEffect(() => {
+    if (mediaType === "video") {
+      setType("veo3");
+    } else {
+      setType("chatgpt");
+    }
+  }, [mediaType]);
+
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
 
@@ -67,7 +76,7 @@ export default function Home() {
 
         <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 PLANETA PROMPTÓW</h1>
 
-        {/* 🔥 NOWOCZESNY FORM */}
+        {/* FORM */}
         <div style={{
           background: "linear-gradient(145deg, #1a1a1a, #111)",
           padding: "25px",
@@ -97,7 +106,6 @@ export default function Home() {
 
                   if (selected.type.startsWith("video")) {
                     setMediaType("video");
-                    setType("veo3");
                   } else {
                     setMediaType("image");
                   }
@@ -124,26 +132,18 @@ export default function Home() {
             style={textareaStyle}
           />
 
-         <select 
-  value={type} 
-  onChange={e=>setType(e.target.value)}
-  style={inputStyle}
->
-  <select 
-  value={type} 
-  onChange={e=>setType(e.target.value)}
-  style={inputStyle}
->
-  {mediaType === "video" ? (
-    <option value="veo3">🎬 Veo3</option>
-  ) : (
-    <>
-      <option value="chatgpt">🤖 ChatGPT</option>
-      <option value="nanobanana">🍌 NanoBanana</option>
-      <option value="grok">🧠 Grok</option>
-    </>
-  )}
-</select>
+          {/* 🔥 SELECT AI */}
+          <select value={type} onChange={e=>setType(e.target.value)} style={inputStyle}>
+            {mediaType === "video" ? (
+              <option value="veo3">🎬 Veo3</option>
+            ) : (
+              <>
+                <option value="chatgpt">🤖 ChatGPT</option>
+                <option value="nanobanana">🍌 NanoBanana</option>
+                <option value="grok">🧠 Grok</option>
+              </>
+            )}
+          </select>
 
           <button onClick={savePrompt} style={buttonStyle}>
             🚀 Dodaj prompt
@@ -172,9 +172,9 @@ export default function Home() {
 
               <p style={{fontSize:"12px", opacity:0.6}}>
                 {item.type === "chatgpt" && "🤖 ChatGPT"}
-{item.type === "nanobanana" && "🍌 NanoBanana"}
-{item.type === "veo3" && "🎬 Veo3"}
-{item.type === "grok" && "🧠 Grok"}
+                {item.type === "nanobanana" && "🍌 NanoBanana"}
+                {item.type === "veo3" && "🎬 Veo3"}
+                {item.type === "grok" && "🧠 Grok"}
               </p>
             </div>
           ))}
@@ -185,7 +185,7 @@ export default function Home() {
   );
 }
 
-/* 🔥 STYLE */
+/* STYLE */
 const inputStyle = {
   width: "100%",
   padding: "12px",
@@ -216,8 +216,7 @@ const buttonStyle = {
   background: "linear-gradient(135deg,#ff0080,#7928ca)",
   color: "white",
   fontWeight: "bold",
-  cursor: "pointer",
-  fontSize: "16px"
+  cursor: "pointer"
 };
 
 const uploadBox = {
