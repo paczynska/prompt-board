@@ -10,8 +10,6 @@ export default function Home() {
   const [mediaType, setMediaType] = useState("image");
   const [preview, setPreview] = useState(null);
   const [sort, setSort] = useState("newest");
-
-  // 🔥 NOWE
   const [uploading, setUploading] = useState(false);
 
   const loadPrompts = async () => {
@@ -29,7 +27,6 @@ export default function Home() {
     else setType("chatgpt");
   }, [mediaType]);
 
-  // 🔥 POPRAWIONY SAVE (ANIMACJA)
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
 
@@ -70,14 +67,11 @@ export default function Home() {
 
   return (
     <div style={{ background: "#000", minHeight: "100vh", color:"white" }}>
-      
       <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
 
         <h1 style={{fontSize:"32px"}}>🔥 PLANETA PROMPTÓW</h1>
 
-        {/* FORM */}
         <div style={cardStyle}>
-
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
             <option value="image">📸 OBRAZ</option>
             <option value="video">🎬 VIDEO</option>
@@ -124,20 +118,16 @@ export default function Home() {
             )}
           </select>
 
-          {/* 🔥 ANIMACJA */}
           <button onClick={savePrompt} style={mainBtn}>
-            {uploading ? "⏳ Uploading..." : "🚀 DODAJ PROMPT"}
+            {uploading ? "⏳ Uploading..." : "🚀 Dodaj prompt"}
           </button>
-
         </div>
 
-        {/* SORT */}
         <select value={sort} onChange={(e)=>setSort(e.target.value)} style={inputStyle}>
           <option value="newest">🆕 Najnowsze</option>
           <option value="oldest">📜 Najstarsze</option>
         </select>
 
-        {/* GRID */}
         <div style={{columnCount:3, columnGap:"20px"}}>
           {[...prompts]
             .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
@@ -168,72 +158,26 @@ export default function Home() {
 }
 
 /* STYLE */
-const cardStyle = {
-  background:"#111",
-  padding:"20px",
-  borderRadius:"16px",
-  margin:"20px 0"
-};
+const cardStyle = { background:"#111", padding:"20px", borderRadius:"16px", margin:"20px 0" };
+const cardMini = { breakInside:"avoid", background:"#1a1a1a", padding:"10px", borderRadius:"12px", marginBottom:"20px" };
+const inputStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white", border:"1px solid #333" };
+const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
+const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px", cursor:"pointer" };
+const previewStyle = { width:"100%", borderRadius:"10px", marginTop:"10px" };
+const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"linear-gradient(135deg,#ff0080,#7928ca)", border:"none", color:"white", cursor:"pointer", marginTop:"10px" };
 
-const cardMini = {
-  breakInside:"avoid",
-  background:"#1a1a1a",
-  padding:"10px",
-  borderRadius:"12px",
-  marginBottom:"20px"
-};
+const tileRow = { display:"flex", gap:"10px", marginTop:"10px" };
 
-const inputStyle = {
-  width:"100%",
-  padding:"10px",
+const tile = {
+  flex:1,
+  textAlign:"center",
+  padding:"8px",
   borderRadius:"10px",
-  margin:"10px 0",
-  background:"#000",
-  color:"white",
-  border:"1px solid #333"
-};
-
-const textareaStyle = {
-  width:"100%",
-  padding:"10px",
-  borderRadius:"10px",
-  margin:"10px 0",
-  background:"#000",
-  color:"white"
-};
-
-const uploadBox = {
-  display:"block",
-  padding:"10px",
-  border:"1px dashed #444",
-  borderRadius:"10px",
-  cursor:"pointer"
-};
-
-const previewStyle = {
-  width:"100%",
-  borderRadius:"10px",
-  marginTop:"10px"
-};
-
-const mainBtn = {
-  width:"100%",
-  padding:"12px",
-  borderRadius:"12px",
-  background:"linear-gradient(135deg,#ff0080,#7928ca)",
-  border:"none",
-  color:"white",
-  cursor:"pointer",
-  marginTop:"10px"
-};
-
-const btnStyle = {
   background:"#222",
-  color:"white",
-  border:"none",
-  padding:"6px 10px",
-  borderRadius:"8px",
-  cursor:"pointer"
+  cursor:"pointer",
+  fontSize:"13px",
+  border:"1px solid #333",
+  transition:"transform 0.1s, background 0.2s"
 };
 
 function Editable({text="", onSave}) {
@@ -242,16 +186,21 @@ function Editable({text="", onSave}) {
   const [expanded,setExpanded]=useState(false);
   const [copied,setCopied]=useState(false);
 
+  const clickAnim = (e)=>{
+    e.currentTarget.style.transform = "scale(0.92)";
+    setTimeout(()=> e.currentTarget.style.transform="scale(1)", 100);
+  };
+
   const copy=()=>{
     navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(()=>setCopied(false),1500);
+    setTimeout(()=>setCopied(false),1200);
   };
 
   if(edit){
     return(
       <div>
-        <textarea value={val} onChange={e=>setVal(e.target.value)}/>
+        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}}/>
         <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
       </div>
     )
@@ -259,21 +208,36 @@ function Editable({text="", onSave}) {
 
   return(
     <div>
-      <p>
+      <p style={{marginTop:"10px"}}>
         {expanded ? text : text.slice(0,120)}
         {text.length>120 && !expanded && "..."}
       </p>
 
-      <div style={{display:"flex",gap:"10px"}}>
+      <div style={tileRow}>
+
         {text.length>120 && (
-          <button onClick={()=>setExpanded(!expanded)} style={btnStyle}>
+          <div 
+            onClick={(e)=>{clickAnim(e); setExpanded(!expanded)}} 
+            style={tile}
+          >
             {expanded?"▲":"▼"}
-          </button>
+          </div>
         )}
-        <button onClick={()=>setEdit(true)} style={btnStyle}>✏️</button>
-        <button onClick={copy} style={btnStyle}>
-          {copied?"✔":"📋"}
-        </button>
+
+        <div 
+          onClick={(e)=>{clickAnim(e); setEdit(true)}} 
+          style={tile}
+        >
+          ✏️
+        </div>
+
+        <div 
+          onClick={(e)=>{clickAnim(e); copy()}} 
+          style={{...tile, background: copied ? "#00c853" : "#222"}}
+        >
+          {copied ? "✔" : "📋"}
+        </div>
+
       </div>
     </div>
   );
