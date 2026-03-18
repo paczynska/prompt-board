@@ -66,12 +66,6 @@ export default function Home() {
     loadPrompts();
   };
 
-  const copyPrompt = (text) => {
-    if (!text) return;
-    navigator.clipboard.writeText(text);
-    alert("Skopiowano prompt 🔥");
-  };
-
   return (
     <div style={{ background: "#000", minHeight: "100vh" }}>
       
@@ -82,7 +76,7 @@ export default function Home() {
         color: "white"
       }}>
 
-        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 PLANETA PROMPTÓW</h1>
+        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
 
         {/* FORM */}
         <div style={{
@@ -92,19 +86,10 @@ export default function Home() {
           marginBottom: "30px"
         }}>
 
-          <select 
-            value={mediaType} 
-            onChange={(e)=>setMediaType(e.target.value)}
-          >
+          <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)}>
             <option value="image">📸 Obraz</option>
             <option value="video">🎬 Video (Veo3)</option>
           </select>
-
-          <p style={{fontSize:"12px", opacity:0.6}}>
-            {mediaType === "video"
-              ? "🎬 Dodajesz video (Veo3)"
-              : "📸 Dodajesz obraz"}
-          </p>
 
           <input 
             key={mediaType}
@@ -140,11 +125,7 @@ export default function Home() {
             placeholder="Wpisz prompt..." 
             value={prompt} 
             onChange={e=>setPrompt(e.target.value)}
-            style={{
-              width:"100%",
-              marginTop:"10px",
-              minHeight:"80px"
-            }}
+            style={{width:"100%", marginTop:"10px"}}
           />
 
           <select 
@@ -177,42 +158,12 @@ export default function Home() {
             }}>
               
               {item.fileType === "video" ? (
-                <video 
-                  src={item.image} 
-                  controls 
-                  style={{width:"100%", maxHeight:"300px"}}
-                />
+                <video src={item.image} controls style={{width:"100%", maxHeight:"300px"}} />
               ) : (
-                <img 
-                  src={item.image} 
-                  style={{
-                    width:"100%",
-                    height:"auto",
-                    maxHeight:"300px",
-                    objectFit:"cover"
-                  }} 
-                />
+                <img src={item.image} style={{width:"100%", maxHeight:"300px", objectFit:"cover"}} />
               )}
 
-              <Editable 
-                text={item.prompt || ""} 
-                onSave={(t)=>editPrompt(item.id, t)} 
-              />
-
-              <button 
-                onClick={()=>copyPrompt(item.prompt)}
-                style={{
-                  marginTop:"5px",
-                  background:"#333",
-                  border:"none",
-                  padding:"5px 10px",
-                  borderRadius:"6px",
-                  color:"white",
-                  cursor:"pointer"
-                }}
-              >
-                📋 Kopiuj prompt
-              </button>
+              <Editable text={item.prompt || ""} onSave={(t)=>editPrompt(item.id, t)} />
 
               <p style={{fontSize:"12px", opacity:0.6}}>
                 {item.type === "chatgpt" && "🤖 ChatGPT"}
@@ -228,12 +179,30 @@ export default function Home() {
   );
 }
 
+/* 🔥 NOWOCZESNE BUTTONY */
+const btnStyle = {
+  background: "#222",
+  border: "1px solid #333",
+  color: "white",
+  padding: "6px 12px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  transition: "0.2s",
+};
+
 function Editable({text = "", onSave}) {
   const [edit, setEdit] = useState(false);
   const [val, setVal] = useState(text);
   const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const isLong = text.length > 120;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
   if (edit) {
     return (
@@ -253,20 +222,33 @@ function Editable({text = "", onSave}) {
       <p style={{
         whiteSpace: "pre-wrap",
         wordBreak: "break-word",
-        lineHeight: "1.6",
-        fontSize: "14px"
+        lineHeight: "1.6"
       }}>
         {expanded || !isLong ? text : text.substring(0,120) + "..."}
       </p>
 
-      <div style={{display:"flex", gap:"10px"}}>
+      <div style={{display:"flex", gap:"10px", marginTop:"8px"}}>
+
         {isLong && (
-          <button onClick={()=>setExpanded(!expanded)}>
-            {expanded ? "▲ zwiń" : "▼ czytaj więcej"}
+          <button onClick={()=>setExpanded(!expanded)} style={btnStyle}>
+            {expanded ? "▲ Zwiń" : "▼ Czytaj więcej"}
           </button>
         )}
 
-        <button onClick={()=>setEdit(true)}>✏️ edytuj</button>
+        <button onClick={()=>setEdit(true)} style={btnStyle}>
+          ✏️ Edytuj
+        </button>
+
+        <button 
+          onClick={handleCopy}
+          style={{
+            ...btnStyle,
+            background: copied ? "#00c853" : "#222"
+          }}
+        >
+          {copied ? "✔ Skopiowano" : "📋 Kopiuj"}
+        </button>
+
       </div>
     </div>
   );
