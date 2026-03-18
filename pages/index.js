@@ -203,7 +203,11 @@ const cardMini = { breakInside:"avoid", background:"#1a1a1a", padding:"10px", bo
 const inputStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white", border:"1px solid #333" };
 const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
 const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px", cursor:"pointer" };
-const previewStyle = { width:"100%", borderRadius:"10px", marginTop:"10px" };
+const previewStyle = { 
+  width:"100%", 
+  borderRadius:"10px", 
+  display:"block"   // 🔥 usuwa przesunięcia
+};
 const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"linear-gradient(135deg,#ff0080,#7928ca)", border:"none", color:"white", cursor:"pointer", marginTop:"10px" };
 
 const imageWrapper = { position:"relative" };
