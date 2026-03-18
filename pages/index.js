@@ -11,6 +11,8 @@ export default function Home() {
   const [preview, setPreview] = useState(null);
   const [sort, setSort] = useState("newest");
   const [uploading, setUploading] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [columns, setColumns] = useState(3);
 
   const loadPrompts = async () => {
     const snapshot = await getDocs(collection(db, "prompts"));
@@ -26,6 +28,17 @@ export default function Home() {
     if (mediaType === "video") setType("veo3");
     else setType("chatgpt");
   }, [mediaType]);
+
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth < 600) setColumns(1);
+      else if (window.innerWidth < 1000) setColumns(2);
+      else setColumns(3);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -44,7 +57,6 @@ export default function Home() {
 
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
-
     setUploading(true);
 
     const url = await uploadFile(file);
@@ -66,7 +78,6 @@ export default function Home() {
 
   const replaceImage = async (id, newFile) => {
     if (!newFile) return;
-
     setUploading(true);
 
     const url = await uploadFile(newFile);
@@ -93,7 +104,6 @@ export default function Home() {
 
         <h1 style={{fontSize:"32px"}}>🔥 PLANETA PROMPTÓW</h1>
 
-        {/* FORM */}
         <div style={cardStyle}>
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
             <option value="image">📸 OBRAZ</option>
@@ -122,40 +132,22 @@ export default function Home() {
               : <img src={preview} style={previewStyle}/>
           )}
 
-          <textarea 
-            value={prompt}
-            onChange={e=>setPrompt(e.target.value)}
-            placeholder="✨ Wpisz prompt..."
-            style={textareaStyle}
-          />
-
-          <select value={type} onChange={(e)=>setType(e.target.value)} style={inputStyle}>
-            {mediaType === "video" ? (
-              <option value="veo3">🎬 Veo3</option>
-            ) : (
-              <>
-                <option value="chatgpt">🤖 CHATGPT</option>
-                <option value="nanobanana">🍌 NANOBANANA</option>
-                <option value="grok">🧠 GROK</option>
-              </>
-            )}
-          </select>
+          <textarea value={prompt} onChange={e=>setPrompt(e.target.value)} style={textareaStyle} />
 
           <button onClick={savePrompt} style={mainBtn}>
             {uploading ? "⏳ Uploading..." : "DODAJ PROMPT"}
           </button>
         </div>
 
-        {/* SORT */}
-        <select value={sort} onChange={(e)=>setSort(e.target.value)} style={inputStyle}>
-          <option value="newest">🆕 Najnowsze</option>
-          <option value="oldest">📜 Najstarsze</option>
-        </select>
+        <div style={tabsWrapper}>
+          <div onClick={()=>setFilter("all")} style={{...tab, ...(filter==="all" ? activeTab : {})}}>🌍</div>
+          <div onClick={()=>setFilter("image")} style={{...tab, ...(filter==="image" ? activeTab : {})}}>📸</div>
+          <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬</div>
+        </div>
 
-        {/* GRID */}
-        <div style={{columnCount:3, columnGap:"20px"}}>
+        <div style={{columnCount:columns, columnGap:"20px"}}>
           {[...prompts]
-            .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
+            .filter(item => filter==="all" || !item.fileType || item.fileType===filter)
             .map(item => (
               <div key={item.id} style={cardMini}>
 
@@ -167,11 +159,7 @@ export default function Home() {
 
                   <label style={replaceBtn}>
                     🔄
-                    <input 
-                      type="file"
-                      onChange={(e)=>replaceImage(item.id, e.target.files[0])}
-                      style={{display:"none"}}
-                    />
+                    <input type="file" onChange={(e)=>replaceImage(item.id, e.target.files[0])} style={{display:"none"}} />
                   </label>
                 </div>
 
@@ -190,20 +178,17 @@ export default function Home() {
 const cardStyle = { background:"#111", padding:"20px", borderRadius:"16px", margin:"20px 0" };
 const cardMini = { breakInside:"avoid", background:"#1a1a1a", padding:"10px", borderRadius:"12px", marginBottom:"20px" };
 const inputStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
-const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
+const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", background:"#000", color:"white" };
 const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px" };
-const previewStyle = { width:"100%", borderRadius:"10px", display:"block" };
-const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"linear-gradient(135deg,#ff0080,#7928ca)", border:"none", color:"white" };
+const previewStyle = { width:"100%", borderRadius:"10px" };
+const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"#ff0080", color:"white" };
 
 const imageWrapper = { position:"relative" };
-const replaceBtn = {
-  position:"absolute",
-  bottom:"10px",
-  right:"10px",
-  background:"rgba(0,0,0,0.85)",
-  padding:"8px",
-  borderRadius:"10px"
-};
+const replaceBtn = { position:"absolute", bottom:"10px", right:"10px", background:"#000", padding:"8px", borderRadius:"10px" };
+
+const tabsWrapper = { display:"flex", gap:"10px", margin:"15px 0" };
+const tab = { padding:"10px", background:"#111", borderRadius:"10px", cursor:"pointer" };
+const activeTab = { background:"#ff0080" };
 
 const tileRow = { display:"flex", gap:"10px", marginTop:"8px" };
 const tile = { flex:1, textAlign:"center", padding:"8px", background:"#222", borderRadius:"10px", cursor:"pointer" };
@@ -242,34 +227,26 @@ const editorTextarea = {
 function Editable({text="", onSave, showAbove=false}) {
   const [edit,setEdit]=useState(false);
   const [val,setVal]=useState(text);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return(
     <div>
 
       {showAbove && (
         <div style={tileRow}>
-          <div onClick={()=>setEdit(true)} style={tile}>✏️</div>
+          <div onClick={()=>setEdit(true)} style={tile}>✏️ EDYTUJ</div>
         </div>
       )}
 
-      <p>{text}</p>
+      <p>{text.slice(0,120)}...</p>
 
       {edit && (
-        isMobile ? (
-          <div style={overlay}>
-            <div style={editorBox}>
-              <textarea value={val} onChange={e=>setVal(e.target.value)} style={editorTextarea}/>
-              <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
-              <button onClick={()=>setEdit(false)}>❌</button>
-            </div>
+        <div style={overlay}>
+          <div style={editorBox}>
+            <textarea value={val} onChange={e=>setVal(e.target.value)} style={editorTextarea}/>
+            <button onClick={()=>{onSave(val);setEdit(false)}}>💾 ZAPISZ</button>
+            <button onClick={()=>setEdit(false)}>❌</button>
           </div>
-        ) : (
-          <div>
-            <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}}/>
-            <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
-          </div>
-        )
+        </div>
       )}
 
     </div>
