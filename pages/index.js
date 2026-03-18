@@ -124,12 +124,11 @@ export default function Home() {
             style={textareaStyle}
           />
 
-          <select 
-            value={type} 
-            onChange={e=>setType(e.target.value)}
-            disabled={mediaType === "video"}
-            style={inputStyle}
-          >
+         <select 
+  value={type} 
+  onChange={e=>setType(e.target.value)}
+  style={inputStyle}
+>
             <option value="chatgpt">🤖 CHATGPT</option>
             <option value="nanobanana">🍌 NANOBANANA</option>
             <option value="veo3">🎬 VEO3</option>
