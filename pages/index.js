@@ -20,37 +20,11 @@ export default function Home() {
     loadPrompts();
   }, []);
 
-  // 🔥 AUTO AI
+  // AUTO AI
   useEffect(() => {
     if (mediaType === "video") setType("veo3");
     else setType("chatgpt");
   }, [mediaType]);
-
-  // 🔥 CHATGPT TŁUMACZ (API)
-  const translateText = async (text, targetLang) => {
-    try {
-      const res = await fetch("/api/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          text,
-          target: targetLang
-        })
-      });
-
-      const data = await res.json();
-
-      if (!data.text) throw new Error();
-
-      return data.text;
-
-    } catch (err) {
-      alert("Błąd tłumaczenia 😅");
-      return text;
-    }
-  };
 
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
@@ -130,16 +104,6 @@ export default function Home() {
             placeholder="✨ Wpisz prompt..."
             style={textareaStyle}
           />
-
-          {/* 🔥 TŁUMACZ */}
-          <div style={{display:"flex", gap:"10px"}}>
-            <button onClick={async()=>setPrompt(await translateText(prompt,"en"))} style={btnStyle}>
-              🇵🇱→🇬🇧
-            </button>
-            <button onClick={async()=>setPrompt(await translateText(prompt,"pl"))} style={btnStyle}>
-              🇬🇧→🇵🇱
-            </button>
-          </div>
 
           {/* SELECT AI */}
           <select value={type} onChange={e=>setType(e.target.value)} style={inputStyle}>
