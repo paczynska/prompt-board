@@ -267,14 +267,10 @@ function Editable({text="", onSave, showAbove=false}) {
   return(
     <div>
       {showAbove && tiles}
-
-      <div style={{
-        overflow:"hidden",
-        transition:"max-height 0.4s ease",
-        maxHeight: expanded ? "1000px" : "80px"
-      }}>
-        <p>{text}</p>
-      </div>
+      <p>
+        {expanded ? text : text.slice(0,120)}
+        {text.length>120 && !expanded && "..."}
+      </p>
     </div>
   );
 }
