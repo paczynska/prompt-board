@@ -65,7 +65,7 @@ export default function Home() {
         color: "white"
       }}>
 
-        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 Prompt Board</h1>
+        <h1 style={{fontSize:"32px", marginBottom:"20px"}}>🔥 PLANETA PROMPTÓW</h1>
 
         {/* 🔥 NOWOCZESNY FORM */}
         <div style={{
@@ -78,8 +78,8 @@ export default function Home() {
         }}>
 
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
-            <option value="image">📸 Obraz</option>
-            <option value="video">🎬 Video (Veo3)</option>
+            <option value="image">📸 OBRAZ</option>
+            <option value="video">🎬 VIDEO</option>
           </select>
 
           <div style={{marginTop:"12px"}}>
@@ -130,9 +130,9 @@ export default function Home() {
             disabled={mediaType === "video"}
             style={inputStyle}
           >
-            <option value="chatgpt">🤖 ChatGPT</option>
-            <option value="nanobanana">🍌 NanoBanana</option>
-            <option value="veo3">🎬 Veo3</option>
+            <option value="chatgpt">🤖 CHATGPT</option>
+            <option value="nanobanana">🍌 NANOBANANA</option>
+            <option value="veo3">🎬 VEO3</option>
           </select>
 
           <button onClick={savePrompt} style={buttonStyle}>
