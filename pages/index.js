@@ -214,14 +214,14 @@ const imageWrapper = { position:"relative" };
 
 const replaceBtn = {
   position:"absolute",
-  top:"10px",
-  left:"10px",
+  bottom:"10px",     // 👈 zmiana
+  right:"10px",      // 👈 zmiana
   background:"rgba(0,0,0,0.85)",
   color:"white",
   borderRadius:"12px",
   padding:"8px 10px",
   cursor:"pointer",
-  zIndex: 9999,              // 🔥 KLUCZOWE
+  zIndex: 9999,
   fontSize:"16px",
   border:"1px solid rgba(255,255,255,0.1)",
   boxShadow:"0 4px 12px rgba(0,0,0,0.5)"
