@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "../lib/firebase";
-import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore";
 
 export default function Home() {
   const [prompts, setPrompts] = useState([]);
@@ -25,6 +25,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (mediaType === "video") setType("veo3");
+    else setType("chatgpt");
+  }, [mediaType]);
+
+  useEffect(() => {
     const update = () => {
       if (window.innerWidth < 600) setColumns(1);
       else if (window.innerWidth < 1000) setColumns(2);
@@ -34,62 +39,6 @@ export default function Home() {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-
-  // 🔥 BACKUP
-  const exportData = () => {
-    const dataStr = JSON.stringify(prompts, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "backup-prompts.json";
-    a.click();
-  };
-
-  // 🔥 IMPORT + DEDUPE + OVERWRITE
-  const importData = async (e, overwrite = false) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const text = await file.text();
-    const data = JSON.parse(text);
-
-    const snapshot = await getDocs(collection(db, "prompts"));
-    const existingDocs = snapshot.docs;
-
-    if (overwrite) {
-      for (const d of existingDocs) {
-        await deleteDoc(doc(db, "prompts", d.id));
-      }
-    }
-
-    const existing = existingDocs.map(d => d.data());
-
-    let added = 0;
-    let skipped = 0;
-
-    for (const item of data) {
-      const isDuplicate = existing.some(p =>
-        p.image === item.image || p.prompt === item.prompt
-      );
-
-      if (!overwrite && isDuplicate) {
-        skipped++;
-        continue;
-      }
-
-      await addDoc(collection(db, "prompts"), {
-        ...item,
-        createdAt: item.createdAt || Date.now()
-      });
-
-      added++;
-    }
-
-    alert(`✅ Dodano: ${added} | Pominięto duplikaty: ${skipped}`);
-    loadPrompts();
-  };
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -110,12 +59,22 @@ export default function Home() {
     if (!file) return alert("Dodaj plik!");
     setUploading(true);
 
+    const snapshot = await getDocs(collection(db, "prompts"));
+    const all = snapshot.docs.map(doc => doc.data());
+
+    const maxNumber = all.length > 0
+      ? Math.max(...all.map(p => p.number || 0))
+      : 0;
+
+    const newNumber = maxNumber + 1;
+
     const url = await uploadFile(file);
 
     await addDoc(collection(db, "prompts"), {
       image: url,
       prompt: prompt || "",
       type,
+      number: newNumber,
       fileType: file.type.startsWith("video") ? "video" : "image",
       createdAt: Date.now()
     });
@@ -127,6 +86,34 @@ export default function Home() {
     loadPrompts();
   };
 
+  const replaceImage = async (id, newFile) => {
+    if (!newFile) return;
+    setUploading(true);
+
+    const url = await uploadFile(newFile);
+    const ref = doc(db, "prompts", id);
+
+    await updateDoc(ref, {
+      image: url,
+      fileType: newFile.type.startsWith("video") ? "video" : "image"
+    });
+
+    setUploading(false);
+    loadPrompts();
+  };
+
+  const editPrompt = async (id, newPrompt) => {
+    const ref = doc(db, "prompts", id);
+    await updateDoc(ref, { prompt: newPrompt });
+    loadPrompts();
+  };
+
+  const updateType = async (id, newType) => {
+    const ref = doc(db, "prompts", id);
+    await updateDoc(ref, { type: newType });
+    loadPrompts();
+  };
+
   const filtered = [...prompts]
     .filter(item => {
       if (filter === "all") return true;
@@ -135,6 +122,7 @@ export default function Home() {
     })
     .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
 
+  // 🔥 STATYSTYKI
   const totalCount = filtered.length;
   const imageCount = filtered.filter(p => p.fileType !== "video").length;
   const videoCount = filtered.filter(p => p.fileType === "video").length;
@@ -147,45 +135,137 @@ export default function Home() {
 
         {/* 🔥 DASHBOARD */}
         <div style={dashboard}>
-          <div style={statCard}><div style={statNumber}>{totalCount}</div><div style={statLabel}>📦 Wszystkie</div></div>
-          <div style={statCard}><div style={statNumber}>{imageCount}</div><div style={statLabel}>📸 Zdjęcia</div></div>
-          <div style={statCard}><div style={statNumber}>{videoCount}</div><div style={statLabel}>🎬 Video</div></div>
+          <div style={statCard}>
+            <div style={statNumber}>{totalCount}</div>
+            <div style={statLabel}>📦 Wszystkie</div>
+          </div>
+
+          <div style={statCard}>
+            <div style={statNumber}>{imageCount}</div>
+            <div style={statLabel}>📸 Zdjęcia</div>
+          </div>
+
+          <div style={statCard}>
+            <div style={statNumber}>{videoCount}</div>
+            <div style={statLabel}>🎬 Video</div>
+          </div>
         </div>
 
-        {/* 🔥 BACKUP SYSTEM */}
-        <div style={backupWrapper}>
-          <button onClick={exportData} style={backupBtn}>💾 Backup</button>
-
-          <label style={backupBtn}>
-            📥 Import
-            <input type="file" accept="application/json" onChange={(e)=>importData(e,false)} style={{display:"none"}} />
-          </label>
-
-          <label style={{...backupBtn, background:"#330000", border:"1px solid #ff4444"}}>
-            ⚠️ Nadpisz bazę
-            <input type="file" accept="application/json" onChange={(e)=>importData(e,true)} style={{display:"none"}} />
-          </label>
-        </div>
-
-        {/* FORM */}
         <div style={cardStyle}>
+          <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
+            <option value="image">📸 OBRAZ</option>
+            <option value="video">🎬 VIDEO</option>
+          </select>
+
           <label style={uploadBox}>
             📁 Wybierz plik
-            <input type="file" onChange={(e)=>{
-              const f = e.target.files?.[0];
-              if (!f) return;
-              setFile(f);
-              setPreview(URL.createObjectURL(f));
-            }} style={{display:"none"}}/>
+            <input 
+              type="file"
+              accept={mediaType === "video" ? "video/*" : "image/*"}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                setFile(f);
+                setPreview(URL.createObjectURL(f));
+                setMediaType(f.type.startsWith("video") ? "video" : "image");
+              }}
+              style={{display:"none"}}
+            />
           </label>
 
-          {preview && <img src={preview} style={previewStyle}/>}
+          {preview && (
+            mediaType === "video"
+              ? <video src={preview} controls style={previewStyle}/>
+              : <img src={preview} style={previewStyle}/>
+          )}
 
-          <textarea value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="✨ Wpisz prompt..." style={textareaStyle}/>
+          <textarea 
+            value={prompt}
+            onChange={e=>setPrompt(e.target.value)}
+            placeholder="✨ Wpisz prompt..."
+            style={textareaStyle}
+          />
+
+          <select value={type} onChange={e=>setType(e.target.value)} style={inputStyle}>
+            {mediaType === "video"
+              ? <option value="veo3">🎬 Veo3</option>
+              : <>
+                  <option value="chatgpt">🤖 CHATGPT</option>
+                  <option value="nanobanana">🍌 NANOBANANA</option>
+                  <option value="grok">🧠 GROK</option>
+                </>
+            }
+          </select>
 
           <button onClick={savePrompt} style={mainBtn}>
             {uploading ? "⏳ Uploading..." : "DODAJ PROMPT"}
           </button>
+        </div>
+
+        <select value={sort} onChange={(e)=>setSort(e.target.value)} style={inputStyle}>
+          <option value="newest">🆕 Najnowsze</option>
+          <option value="oldest">📜 Najstarsze</option>
+        </select>
+
+        <div style={tabsWrapper}>
+          <div onClick={()=>setFilter("all")} style={{...tab, ...(filter==="all" ? activeTab : {})}}>🌍 Wszystko</div>
+          <div onClick={()=>setFilter("image")} style={{...tab, ...(filter==="image" ? activeTab : {})}}>📸 Zdjęcia</div>
+          <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬 Video</div>
+        </div>
+
+        <div style={{columnCount:columns, columnGap:"20px"}}>
+          {filtered.map((item, index) => (
+            <div key={item.id} style={cardMini}>
+
+              <div style={numberBadge}>
+                #{filtered.length - index}
+              </div>
+
+              <div style={imageWrapper}>
+                {item.fileType==="video"
+                  ? <video src={item.image} controls style={previewStyle}/>
+                  : <img src={item.image} style={previewStyle}/>
+                }
+
+                <label style={replaceBtn}>
+                  🔄
+                  <input type="file" accept="image/*,video/*" onChange={(e)=>replaceImage(item.id, e.target.files[0])} style={{display:"none"}} />
+                </label>
+              </div>
+
+              <Editable 
+                text={item.prompt||""} 
+                number={filtered.length - index}
+                onSave={(t)=>editPrompt(item.id,t)} 
+              />
+
+              <select
+                value={item.type}
+                onChange={(e)=>updateType(item.id, e.target.value)}
+                style={{
+                  width:"100%",
+                  padding:"6px",
+                  borderRadius:"8px",
+                  marginTop:"8px",
+                  background:"#000",
+                  color:"white",
+                  border:"1px solid #333",
+                  fontSize:"12px"
+                }}
+              >
+                {item.fileType === "video" ? (
+                  <option value="veo3">🎬 Veo3</option>
+                ) : (
+                  <>
+                    <option value="chatgpt">🤖 ChatGPT</option>
+                    <option value="nanobanana">🍌 NanoBanana</option>
+                    <option value="grok">🧠 Grok</option>
+                  </>
+                )}
+              </select>
+
+            </div>
+          ))}
         </div>
 
       </div>
@@ -206,25 +286,138 @@ const statCard = {
   border: "1px solid #333",
   borderRadius: "16px",
   padding: "20px",
-  textAlign: "center"
+  textAlign: "center",
+  boxShadow: "0 0 20px rgba(255,255,255,0.05)"
 };
 
-const statNumber = { fontSize: "28px", fontWeight: "bold" };
-const statLabel = { fontSize: "13px", opacity: 0.7 };
+const statNumber = {
+  fontSize: "28px",
+  fontWeight: "bold",
+  marginBottom: "5px"
+};
 
-const backupWrapper = { display: "flex", gap: "10px", marginBottom: "15px" };
-
-const backupBtn = {
-  padding: "10px 16px",
-  borderRadius: "12px",
-  background: "#111",
-  border: "1px solid #333",
-  color: "white",
-  cursor: "pointer"
+const statLabel = {
+  fontSize: "13px",
+  opacity: 0.7
 };
 
 const cardStyle = { background:"#111", padding:"20px", borderRadius:"16px", margin:"20px 0" };
+
+const cardMini = { 
+  breakInside:"avoid",
+  background:"#1a1a1a", 
+  padding:"10px", 
+  borderRadius:"12px", 
+  marginBottom:"20px",
+  position:"relative"
+};
+
+const inputStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white", border:"1px solid #333" };
 const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
 const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px", cursor:"pointer" };
-const previewStyle = { width:"100%", borderRadius:"10px" };
+const previewStyle = { width:"100%", borderRadius:"10px", display:"block" };
 const mainBtn = { width:"100%", padding:"12px", borderRadius:"12px", background:"linear-gradient(135deg,#ff0080,#7928ca)", border:"none", color:"white", cursor:"pointer", marginTop:"10px" };
+
+const imageWrapper = { position:"relative" };
+
+const replaceBtn = {
+  position:"absolute",
+  bottom:"10px",
+  right:"10px",
+  background:"rgba(0,0,0,0.85)",
+  color:"white",
+  borderRadius:"12px",
+  padding:"8px 10px",
+  cursor:"pointer",
+  zIndex:9999
+};
+
+const numberBadge = {
+  position: "absolute",
+  top: "10px",
+  left: "10px",
+  background: "rgba(0,0,0,0.85)",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "12px",
+  fontSize: "12px",
+  fontWeight: "bold",
+  zIndex: 10
+};
+
+const tabsWrapper = { display:"flex", gap:"10px", margin:"15px 0" };
+
+const tab = {
+  padding:"10px 16px",
+  borderRadius:"12px",
+  background:"#111",
+  border:"1px solid #333",
+  cursor:"pointer",
+  color:"#aaa"
+};
+
+const activeTab = {
+  background:"linear-gradient(135deg,#ff0080,#7928ca)",
+  color:"white",
+  border:"none"
+};
+
+function Editable({text="", number, onSave}) {
+  const [edit,setEdit]=useState(false);
+  const [val,setVal]=useState(text);
+  const [copied,setCopied]=useState(false);
+
+  const copy=()=>{
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(()=>setCopied(false),1200);
+  };
+
+  if(edit){
+    return(
+      <div>
+        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}}/>
+        <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
+      </div>
+    )
+  }
+
+  return(
+    <div style={{marginTop:"10px"}}>
+      <div style={{display:"flex", gap:"10px", marginBottom:"8px"}}>
+        <div onClick={()=>setEdit(true)} style={tile}>✏️</div>
+        <div onClick={copy} style={{...tile, background: copied ? "#00c853" : "#222"}}>
+          {copied ? "✔" : "📋"}
+        </div>
+      </div>
+
+      <div style={promptBox}>
+        <div style={{opacity:0.6, marginBottom:"6px"}}>
+          #{number}
+        </div>
+        {text}
+      </div>
+    </div>
+  );
+}
+
+const tile = {
+  flex:1,
+  textAlign:"center",
+  padding:"8px",
+  borderRadius:"10px",
+  background:"#222",
+  cursor:"pointer"
+};
+
+const promptBox = {
+  whiteSpace: "pre-wrap",
+  background: "#000",
+  padding: "12px",
+  borderRadius: "12px",
+  fontSize: "13px",
+  lineHeight: "1.6",
+  border: "1px solid #333",
+  maxHeight: "250px",
+  overflowY: "auto"
+};
