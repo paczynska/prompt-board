@@ -1,3 +1,4 @@
+```javascript
 import { useEffect, useState } from "react";
 import { db } from "../lib/firebase";
 import { collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore";
@@ -29,7 +30,6 @@ export default function Home() {
     else setType("chatgpt");
   }, [mediaType]);
 
-  // 🔥 RESPONSIVE GRID
   useEffect(() => {
     const update = () => {
       if (window.innerWidth < 600) setColumns(1);
@@ -105,7 +105,6 @@ export default function Home() {
 
         <h1 style={{fontSize:"32px"}}>🔥 PLANETA PROMPTÓW</h1>
 
-        {/* FORM */}
         <div style={cardStyle}>
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
             <option value="image">📸 OBRAZ</option>
@@ -157,25 +156,22 @@ export default function Home() {
           </button>
         </div>
 
-        {/* SORT */}
         <select value={sort} onChange={(e)=>setSort(e.target.value)} style={inputStyle}>
           <option value="newest">🆕 Najnowsze</option>
           <option value="oldest">📜 Najstarsze</option>
         </select>
 
-        {/* TABS */}
         <div style={tabsWrapper}>
           <div onClick={()=>setFilter("all")} style={{...tab, ...(filter==="all" ? activeTab : {})}}>🌍 Wszystko</div>
           <div onClick={()=>setFilter("image")} style={{...tab, ...(filter==="image" ? activeTab : {})}}>📸 Zdjęcia</div>
           <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬 Video</div>
         </div>
 
-        {/* GRID */}
         <div style={{columnCount:columns, columnGap:"20px"}}>
           {[...prompts]
             .filter(item => {
               if (filter === "all") return true;
-              if (!item.fileType) return filter === "image"; // 🔥 fix starych danych
+              if (!item.fileType) return filter === "image";
               return item.fileType === filter;
             })
             .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
@@ -194,7 +190,7 @@ export default function Home() {
                   </label>
                 </div>
 
-                <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} showAbove />
+                <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} />
 
                 <p style={{opacity:0.6,fontSize:"12px"}}>
                   {item.type==="chatgpt" && "🤖 ChatGPT"}
@@ -252,7 +248,41 @@ const activeTab = {
   border:"none"
 };
 
-const tileRow = { display:"flex", gap:"10px", marginTop:"8px" };
+function Editable({text="", onSave}) {
+  const [edit,setEdit]=useState(false);
+  const [val,setVal]=useState(text);
+  const [copied,setCopied]=useState(false);
+
+  const copy=()=>{
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(()=>setCopied(false),1200);
+  };
+
+  if(edit){
+    return(
+      <div>
+        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}}/>
+        <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
+      </div>
+    )
+  }
+
+  return(
+    <div style={{marginTop:"10px"}}>
+      <div style={{display:"flex", gap:"10px", marginBottom:"8px"}}>
+        <div onClick={()=>setEdit(true)} style={tile}>✏️</div>
+        <div onClick={copy} style={{...tile, background: copied ? "#00c853" : "#222"}}>
+          {copied ? "✔" : "📋"}
+        </div>
+      </div>
+
+      <div style={promptBox}>
+        {text}
+      </div>
+    </div>
+  );
+}
 
 const tile = {
   flex:1,
@@ -263,49 +293,15 @@ const tile = {
   cursor:"pointer"
 };
 
-function Editable({text="", onSave, showAbove=false}) {
-  const [edit,setEdit]=useState(false);
-  const [val,setVal]=useState(text);
-  const [expanded,setExpanded]=useState(false);
-  const [copied,setCopied]=useState(false);
-
-  const copy=()=>{
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(()=>setCopied(false),1200);
-  };
-
-  const tiles = (
-    <div style={tileRow}>
-      {text.length>120 && (
-        <div onClick={()=>setExpanded(!expanded)} style={tile}>
-          {expanded ? "▲" : "▼"}
-        </div>
-      )}
-      <div onClick={()=>setEdit(true)} style={tile}>✏️</div>
-      <div onClick={copy} style={{...tile, background: copied ? "#00c853" : "#222"}}>
-        {copied ? "✔" : "📋"}
-      </div>
-    </div>
-  );
-
-  if(edit){
-    return(
-      <div>
-        {tiles}
-        <textarea value={val} onChange={e=>setVal(e.target.value)} style={{width:"100%"}}/>
-        <button onClick={()=>{onSave(val);setEdit(false)}}>💾</button>
-      </div>
-    )
-  }
-
-  return(
-    <div>
-      {showAbove && tiles}
-      <p>
-        {expanded ? text : text.slice(0,120)}
-        {text.length>120 && !expanded && "..."}
-      </p>
-    </div>
-  );
-}
+const promptBox = {
+  whiteSpace: "pre-wrap",
+  background: "#000",
+  padding: "12px",
+  borderRadius: "12px",
+  fontSize: "13px",
+  lineHeight: "1.6",
+  border: "1px solid #333",
+  maxHeight: "250px",
+  overflowY: "auto"
+};
+```
