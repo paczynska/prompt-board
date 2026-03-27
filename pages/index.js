@@ -270,10 +270,10 @@ const numberBadge = {
   position: "absolute",
   top: "10px",
   left: "10px",
-  background: "linear-gradient(135deg,#ff0080,#7928ca)",
+  background: "rgba(0,0,0,0.85)", // 🔥 taki jak przy 🔄
   color: "white",
   padding: "6px 10px",
-  borderRadius: "10px",
+  borderRadius: "12px",
   fontSize: "12px",
   fontWeight: "bold",
   zIndex: 10
