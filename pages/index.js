@@ -98,6 +98,13 @@ export default function Home() {
     loadPrompts();
   };
 
+  // 🔥 NOWA FUNKCJA — zmiana typu
+  const updateType = async (id, newType) => {
+    const ref = doc(db, "prompts", id);
+    await updateDoc(ref, { type: newType });
+    loadPrompts();
+  };
+
   return (
     <div style={{ background: "#000", minHeight: "100vh", color:"white" }}>
       <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
@@ -191,12 +198,31 @@ export default function Home() {
 
                 <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} />
 
-                <p style={{opacity:0.6,fontSize:"12px"}}>
-                  {item.type==="chatgpt" && "🤖 ChatGPT"}
-                  {item.type==="nanobanana" && "🍌 NanoBanana"}
-                  {item.type==="veo3" && "🎬 Veo3"}
-                  {item.type==="grok" && "🧠 Grok"}
-                </p>
+                {/* 🔥 EDYCJA TYPU */}
+                <select
+                  value={item.type}
+                  onChange={(e)=>updateType(item.id, e.target.value)}
+                  style={{
+                    width:"100%",
+                    padding:"6px",
+                    borderRadius:"8px",
+                    marginTop:"8px",
+                    background:"#000",
+                    color:"white",
+                    border:"1px solid #333",
+                    fontSize:"12px"
+                  }}
+                >
+                  {item.fileType === "video" ? (
+                    <option value="veo3">🎬 Veo3</option>
+                  ) : (
+                    <>
+                      <option value="chatgpt">🤖 ChatGPT</option>
+                      <option value="nanobanana">🍌 NanoBanana</option>
+                      <option value="grok">🧠 Grok</option>
+                    </>
+                  )}
+                </select>
 
               </div>
             ))}
