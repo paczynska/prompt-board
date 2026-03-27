@@ -98,7 +98,6 @@ export default function Home() {
     loadPrompts();
   };
 
-  // 🔥 NOWA FUNKCJA — zmiana typu
   const updateType = async (id, newType) => {
     const ref = doc(db, "prompts", id);
     await updateDoc(ref, { type: newType });
@@ -181,8 +180,11 @@ export default function Home() {
               return item.fileType === filter;
             })
             .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
-            .map(item => (
+            .map((item, index) => (
               <div key={item.id} style={cardMini}>
+
+                {/* 🔥 NUMER */}
+                <div style={numberBadge}>#{index + 1}</div>
 
                 <div style={imageWrapper}>
                   {item.fileType==="video"
@@ -198,7 +200,6 @@ export default function Home() {
 
                 <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} />
 
-                {/* 🔥 EDYCJA TYPU */}
                 <select
                   value={item.type}
                   onChange={(e)=>updateType(item.id, e.target.value)}
@@ -235,7 +236,16 @@ export default function Home() {
 
 /* STYLE */
 const cardStyle = { background:"#111", padding:"20px", borderRadius:"16px", margin:"20px 0" };
-const cardMini = { breakInside:"avoid", background:"#1a1a1a", padding:"10px", borderRadius:"12px", marginBottom:"20px" };
+
+const cardMini = { 
+  breakInside:"avoid", 
+  background:"#1a1a1a", 
+  padding:"10px", 
+  borderRadius:"12px", 
+  marginBottom:"20px",
+  position:"relative"
+};
+
 const inputStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white", border:"1px solid #333" };
 const textareaStyle = { width:"100%", padding:"10px", borderRadius:"10px", margin:"10px 0", background:"#000", color:"white" };
 const uploadBox = { display:"block", padding:"10px", border:"1px dashed #444", borderRadius:"10px", cursor:"pointer" };
@@ -254,6 +264,19 @@ const replaceBtn = {
   padding:"8px 10px",
   cursor:"pointer",
   zIndex:9999
+};
+
+const numberBadge = {
+  position: "absolute",
+  top: "10px",
+  left: "10px",
+  background: "linear-gradient(135deg,#ff0080,#7928ca)",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "10px",
+  fontSize: "12px",
+  fontWeight: "bold",
+  zIndex: 10
 };
 
 const tabsWrapper = { display:"flex", gap:"10px", margin:"15px 0" };
