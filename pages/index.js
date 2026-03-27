@@ -194,15 +194,21 @@ export default function Home() {
           {filtered.map((item, index) => (
             <div key={item.id} style={cardMini}>
 
-              {/* 🔥 NUMER OD DOŁU */}
+              {/* 🔥 NUMER PRAWA → GÓRA */}
               <div style={numberBadge}>
                 {(() => {
                   const total = filtered.length;
-                  const col = index % columns;
-                  const row = Math.floor(index / columns);
-                  const rows = Math.ceil(total / columns);
+                  const cols = columns;
+                  const rows = Math.ceil(total / cols);
+
+                  const col = index % cols;
+                  const row = Math.floor(index / cols);
+
                   const reversedRow = rows - row - 1;
-                  const newIndex = reversedRow * columns + col;
+                  const reversedCol = cols - col - 1;
+
+                  const newIndex = reversedCol * rows + reversedRow;
+
                   return `#${newIndex + 1}`;
                 })()}
               </div>
