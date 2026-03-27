@@ -1,4 +1,3 @@
-```javascript
 import { useEffect, useState } from "react";
 import { db } from "../lib/firebase";
 import { collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore";
@@ -304,4 +303,3 @@ const promptBox = {
   maxHeight: "250px",
   overflowY: "auto"
 };
-```
