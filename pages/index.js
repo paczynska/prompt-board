@@ -55,9 +55,19 @@ export default function Home() {
     return data.secure_url;
   };
 
+  // 🔥 STAŁY NUMER
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
     setUploading(true);
+
+    const snapshot = await getDocs(collection(db, "prompts"));
+    const all = snapshot.docs.map(doc => doc.data());
+
+    const maxNumber = all.length > 0
+      ? Math.max(...all.map(p => p.number || 0))
+      : 0;
+
+    const newNumber = maxNumber + 1;
 
     const url = await uploadFile(file);
 
@@ -65,6 +75,7 @@ export default function Home() {
       image: url,
       prompt: prompt || "",
       type,
+      number: newNumber,
       fileType: file.type.startsWith("video") ? "video" : "image",
       createdAt: Date.now()
     });
@@ -172,6 +183,7 @@ export default function Home() {
           <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬 Video</div>
         </div>
 
+        {/* 🔥 PINTREST UKŁAD ZOSTAJE */}
         <div style={{columnCount:columns, columnGap:"20px"}}>
           {[...prompts]
             .filter(item => {
@@ -183,8 +195,10 @@ export default function Home() {
             .map((item, index) => (
               <div key={item.id} style={cardMini}>
 
-                {/* 🔥 NUMER */}
-                <div style={numberBadge}>#{index + 1}</div>
+                {/* 🔥 STAŁY NUMER */}
+                <div style={numberBadge}>
+                  #{item.number || index + 1}
+                </div>
 
                 <div style={imageWrapper}>
                   {item.fileType==="video"
@@ -238,7 +252,7 @@ export default function Home() {
 const cardStyle = { background:"#111", padding:"20px", borderRadius:"16px", margin:"20px 0" };
 
 const cardMini = { 
-  breakInside:"avoid", 
+  breakInside:"avoid",
   background:"#1a1a1a", 
   padding:"10px", 
   borderRadius:"12px", 
@@ -270,7 +284,7 @@ const numberBadge = {
   position: "absolute",
   top: "10px",
   left: "10px",
-  background: "rgba(0,0,0,0.85)", // 🔥 taki jak przy 🔄
+  background: "rgba(0,0,0,0.85)",
   color: "white",
   padding: "6px 10px",
   borderRadius: "12px",
