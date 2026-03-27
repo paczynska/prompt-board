@@ -194,23 +194,9 @@ export default function Home() {
           {filtered.map((item, index) => (
             <div key={item.id} style={cardMini}>
 
-              {/* 🔥 NUMER PRAWA → GÓRA */}
+              {/* NUMER W ROGU */}
               <div style={numberBadge}>
-                {(() => {
-                  const total = filtered.length;
-                  const cols = columns;
-                  const rows = Math.ceil(total / cols);
-
-                  const col = index % cols;
-                  const row = Math.floor(index / cols);
-
-                  const reversedRow = rows - row - 1;
-                  const reversedCol = cols - col - 1;
-
-                  const newIndex = reversedCol * rows + reversedRow;
-
-                  return `#${newIndex + 1}`;
-                })()}
+                #{filtered.length - index}
               </div>
 
               <div style={imageWrapper}>
@@ -225,7 +211,11 @@ export default function Home() {
                 </label>
               </div>
 
-              <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} />
+              <Editable 
+                text={item.prompt||""} 
+                number={filtered.length - index}
+                onSave={(t)=>editPrompt(item.id,t)} 
+              />
 
               <select
                 value={item.type}
@@ -323,7 +313,7 @@ const activeTab = {
   border:"none"
 };
 
-function Editable({text="", onSave}) {
+function Editable({text="", number, onSave}) {
   const [edit,setEdit]=useState(false);
   const [val,setVal]=useState(text);
   const [copied,setCopied]=useState(false);
@@ -353,6 +343,9 @@ function Editable({text="", onSave}) {
       </div>
 
       <div style={promptBox}>
+        <div style={{opacity:0.6, marginBottom:"6px"}}>
+          #{number}
+        </div>
         {text}
       </div>
     </div>
