@@ -122,11 +122,34 @@ export default function Home() {
     })
     .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
 
+  // 🔥 STATYSTYKI
+  const totalCount = filtered.length;
+  const imageCount = filtered.filter(p => p.fileType !== "video").length;
+  const videoCount = filtered.filter(p => p.fileType === "video").length;
+
   return (
     <div style={{ background: "#000", minHeight: "100vh", color:"white" }}>
       <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
 
         <h1 style={{fontSize:"32px"}}>🔥 PLANETA PROMPTÓW</h1>
+
+        {/* 🔥 DASHBOARD */}
+        <div style={dashboard}>
+          <div style={statCard}>
+            <div style={statNumber}>{totalCount}</div>
+            <div style={statLabel}>📦 Wszystkie</div>
+          </div>
+
+          <div style={statCard}>
+            <div style={statNumber}>{imageCount}</div>
+            <div style={statLabel}>📸 Zdjęcia</div>
+          </div>
+
+          <div style={statCard}>
+            <div style={statNumber}>{videoCount}</div>
+            <div style={statLabel}>🎬 Video</div>
+          </div>
+        </div>
 
         <div style={cardStyle}>
           <select value={mediaType} onChange={(e)=>setMediaType(e.target.value)} style={inputStyle}>
@@ -194,7 +217,6 @@ export default function Home() {
           {filtered.map((item, index) => (
             <div key={item.id} style={cardMini}>
 
-              {/* NUMER W ROGU */}
               <div style={numberBadge}>
                 #{filtered.length - index}
               </div>
@@ -252,6 +274,33 @@ export default function Home() {
 }
 
 /* STYLE */
+const dashboard = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+  gap: "15px",
+  marginBottom: "20px"
+};
+
+const statCard = {
+  background: "linear-gradient(135deg,#111,#1a1a1a)",
+  border: "1px solid #333",
+  borderRadius: "16px",
+  padding: "20px",
+  textAlign: "center",
+  boxShadow: "0 0 20px rgba(255,255,255,0.05)"
+};
+
+const statNumber = {
+  fontSize: "28px",
+  fontWeight: "bold",
+  marginBottom: "5px"
+};
+
+const statLabel = {
+  fontSize: "13px",
+  opacity: 0.7
+};
+
 const cardStyle = { background:"#111", padding:"20px", borderRadius:"16px", margin:"20px 0" };
 
 const cardMini = { 
