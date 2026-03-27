@@ -55,7 +55,6 @@ export default function Home() {
     return data.secure_url;
   };
 
-  // 🔥 STAŁY NUMER
   const savePrompt = async () => {
     if (!file) return alert("Dodaj plik!");
     setUploading(true);
@@ -114,6 +113,14 @@ export default function Home() {
     await updateDoc(ref, { type: newType });
     loadPrompts();
   };
+
+  const filtered = [...prompts]
+    .filter(item => {
+      if (filter === "all") return true;
+      if (!item.fileType) return filter === "image";
+      return item.fileType === filter;
+    })
+    .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
 
   return (
     <div style={{ background: "#000", minHeight: "100vh", color:"white" }}>
@@ -183,64 +190,64 @@ export default function Home() {
           <div onClick={()=>setFilter("video")} style={{...tab, ...(filter==="video" ? activeTab : {})}}>🎬 Video</div>
         </div>
 
-        {/* 🔥 PINTREST UKŁAD ZOSTAJE */}
         <div style={{columnCount:columns, columnGap:"20px"}}>
-          {[...prompts]
-            .filter(item => {
-              if (filter === "all") return true;
-              if (!item.fileType) return filter === "image";
-              return item.fileType === filter;
-            })
-            .sort((a, b) => sort==="newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
-            .map((item, index) => (
-              <div key={item.id} style={cardMini}>
+          {filtered.map((item, index) => (
+            <div key={item.id} style={cardMini}>
 
-                {/* 🔥 STAŁY NUMER */}
-                <div style={numberBadge}>
-                  #{item.number || index + 1}
-                </div>
-
-                <div style={imageWrapper}>
-                  {item.fileType==="video"
-                    ? <video src={item.image} controls style={previewStyle}/>
-                    : <img src={item.image} style={previewStyle}/>
-                  }
-
-                  <label style={replaceBtn}>
-                    🔄
-                    <input type="file" accept="image/*,video/*" onChange={(e)=>replaceImage(item.id, e.target.files[0])} style={{display:"none"}} />
-                  </label>
-                </div>
-
-                <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} />
-
-                <select
-                  value={item.type}
-                  onChange={(e)=>updateType(item.id, e.target.value)}
-                  style={{
-                    width:"100%",
-                    padding:"6px",
-                    borderRadius:"8px",
-                    marginTop:"8px",
-                    background:"#000",
-                    color:"white",
-                    border:"1px solid #333",
-                    fontSize:"12px"
-                  }}
-                >
-                  {item.fileType === "video" ? (
-                    <option value="veo3">🎬 Veo3</option>
-                  ) : (
-                    <>
-                      <option value="chatgpt">🤖 ChatGPT</option>
-                      <option value="nanobanana">🍌 NanoBanana</option>
-                      <option value="grok">🧠 Grok</option>
-                    </>
-                  )}
-                </select>
-
+              {/* 🔥 NUMER OD DOŁU */}
+              <div style={numberBadge}>
+                {(() => {
+                  const total = filtered.length;
+                  const col = index % columns;
+                  const row = Math.floor(index / columns);
+                  const rows = Math.ceil(total / columns);
+                  const reversedRow = rows - row - 1;
+                  const newIndex = reversedRow * columns + col;
+                  return `#${newIndex + 1}`;
+                })()}
               </div>
-            ))}
+
+              <div style={imageWrapper}>
+                {item.fileType==="video"
+                  ? <video src={item.image} controls style={previewStyle}/>
+                  : <img src={item.image} style={previewStyle}/>
+                }
+
+                <label style={replaceBtn}>
+                  🔄
+                  <input type="file" accept="image/*,video/*" onChange={(e)=>replaceImage(item.id, e.target.files[0])} style={{display:"none"}} />
+                </label>
+              </div>
+
+              <Editable text={item.prompt||""} onSave={(t)=>editPrompt(item.id,t)} />
+
+              <select
+                value={item.type}
+                onChange={(e)=>updateType(item.id, e.target.value)}
+                style={{
+                  width:"100%",
+                  padding:"6px",
+                  borderRadius:"8px",
+                  marginTop:"8px",
+                  background:"#000",
+                  color:"white",
+                  border:"1px solid #333",
+                  fontSize:"12px"
+                }}
+              >
+                {item.fileType === "video" ? (
+                  <option value="veo3">🎬 Veo3</option>
+                ) : (
+                  <>
+                    <option value="chatgpt">🤖 ChatGPT</option>
+                    <option value="nanobanana">🍌 NanoBanana</option>
+                    <option value="grok">🧠 Grok</option>
+                  </>
+                )}
+              </select>
+
+            </div>
+          ))}
         </div>
 
       </div>
